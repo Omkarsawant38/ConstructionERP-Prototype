@@ -45,11 +45,11 @@ export default function LoginPage() {
     >
       {/* Left Panel - Branding */}
       <div
-        className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: "var(--color-sidebar)" }}
+        className="hidden lg:flex lg:w-1/2 flex-col justify-between relative overflow-hidden"
+        style={{ background: "var(--color-sidebar)", padding: "48px" }}
       >
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-12">
+          <div className="flex items-center" style={{ gap: "12px", marginBottom: "48px" }}>
             <div
               className="flex items-center justify-center w-12 h-12 rounded-xl"
               style={{ background: "var(--color-primary)" }}
@@ -62,7 +62,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <h2 className="text-4xl font-bold leading-tight mb-6" style={{ color: "var(--color-text-primary)" }}>
+          <h2 className="text-4xl font-bold leading-tight" style={{ color: "var(--color-text-primary)", marginBottom: "24px" }}>
             Build Smarter.<br />
             <span style={{ color: "var(--color-primary)" }}>Manage Better.</span><br />
             Deliver Faster.
@@ -75,7 +75,7 @@ export default function LoginPage() {
         </div>
 
         {/* Stats */}
-        <div className="relative z-10 grid grid-cols-3 gap-6">
+        <div className="relative z-10 grid grid-cols-3" style={{ gap: "24px" }}>
           {[
             { label: "Projects Managed", value: "500+" },
             { label: "Budget Tracked", value: "₹200 Cr+" },
@@ -102,10 +102,10 @@ export default function LoginPage() {
       </div>
 
       {/* Right Panel - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center" style={{ padding: "32px" }}>
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
+          <div className="lg:hidden flex items-center justify-center" style={{ gap: "12px", marginBottom: "32px" }}>
             <div
               className="flex items-center justify-center w-10 h-10 rounded-xl"
               style={{ background: "var(--color-primary)" }}
@@ -117,10 +117,10 @@ export default function LoginPage() {
             </h1>
           </div>
 
-          <div className="text-center mb-8">
+          <div className="text-center" style={{ marginBottom: "32px" }}>
             <h2
-              className="text-2xl font-bold mb-2"
-              style={{ color: "var(--color-text-primary)" }}
+              className="text-2xl font-bold"
+              style={{ color: "var(--color-text-primary)", marginBottom: "8px" }}
             >
               Welcome back
             </h2>
@@ -142,7 +142,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="flex flex-col" style={{ gap: "20px" }}>
             <div>
               <label htmlFor="email" className="form-label">
                 Email Address
@@ -207,8 +207,8 @@ export default function LoginPage() {
           </form>
 
           <p
-            className="text-center text-xs mt-8"
-            style={{ color: "var(--color-text-muted)" }}
+            className="text-center text-xs"
+            style={{ color: "var(--color-text-muted)", marginTop: "32px" }}
           >
             Construction ERP Demo &middot; For authorized users only
           </p>

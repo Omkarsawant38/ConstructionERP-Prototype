@@ -140,10 +140,10 @@ export function TopNav() {
           {/* Dropdown */}
           {showUserMenu && (
             <div
-              className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border py-1 animate-scale-in"
-              style={{ borderColor: "var(--color-border)" }}
+              className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border animate-scale-in"
+              style={{ padding: "4px 0", borderColor: "var(--color-border)" }}
             >
-              <div className="px-4 py-3 border-b" style={{ borderColor: "var(--color-border-light)" }}>
+              <div className="border-b" style={{ padding: "12px 16px", borderColor: "var(--color-border-light)" }}>
                 <p className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
                   {displayName}
                 </p>
@@ -156,8 +156,8 @@ export function TopNav() {
                   setShowUserMenu(false);
                   router.push("/settings");
                 }}
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
-                style={{ color: "var(--color-text-primary)" }}
+                className="flex items-center w-full text-sm hover:bg-gray-50 transition-colors"
+                style={{ padding: "10px 16px", gap: "12px", color: "var(--color-text-primary)" }}
               >
                 <User size={16} />
                 Profile
@@ -167,8 +167,8 @@ export function TopNav() {
                   setShowUserMenu(false);
                   router.push("/settings");
                 }}
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
-                style={{ color: "var(--color-text-primary)" }}
+                className="flex items-center w-full text-sm hover:bg-gray-50 transition-colors"
+                style={{ padding: "10px 16px", gap: "12px", color: "var(--color-text-primary)" }}
               >
                 <Settings size={16} />
                 Settings
@@ -176,8 +176,8 @@ export function TopNav() {
               <div className="border-t my-1" style={{ borderColor: "var(--color-border-light)" }} />
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm hover:bg-red-50 transition-colors"
-                style={{ color: "var(--color-error)" }}
+                className="flex items-center w-full text-sm hover:bg-red-50 transition-colors"
+                style={{ padding: "10px 16px", gap: "12px", color: "var(--color-error)" }}
               >
                 <LogOut size={16} />
                 Sign Out
