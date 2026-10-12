@@ -19,7 +19,7 @@ import {
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
-  { name: "Projects", href: "/projects", icon: FolderKanban, permission: "projects.view" },
+  { name: "Sites", href: "/projects", icon: FolderKanban, permission: "projects.view" },
   { name: "Finance & Billing", href: "/finance", icon: DollarSign, permission: "finance.view" },
   { name: "Settings", href: "/settings", icon: Settings, permission: "settings.view" },
 ];

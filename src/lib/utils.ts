@@ -128,3 +128,59 @@ export function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.substring(0, maxLength) + "...";
 }
+
+// Pool of verified authentic active construction site images (cranes, excavators, rebar, scaffolds, concrete)
+const PROJECT_IMAGES_POOL = [
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Tower_crane_at_a_building_construction_site_in_Taichung_2023-05-13_01.jpg/960px-Tower_crane_at_a_building_construction_site_in_Taichung_2023-05-13_01.jpg", // Active residential high-rise building under construction with tower crane
+  "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800&auto=format&fit=crop", // Commercial high-rise structural rebar & workers with tower cranes
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Jiangsu_Provincial_Highway_238_construction_site_%2820240217%29_P3.jpg/960px-Jiangsu_Provincial_Highway_238_construction_site_%2820240217%29_P3.jpg", // Heavy highway flyover & bridge civil engineering construction site
+  "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=800&auto=format&fit=crop", // Industrial site construction worker with hardhat, safety gear & power tool
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Excavator_performs_earth_digging.jpg/960px-Excavator_performs_earth_digging.jpg", // Heavy CAT excavator performing site excavation and foundation digging
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/79/Constructions_and_scaffolding_at_the_Oosterdokseiland%2C_Amsterdam-Centrum.jpg/960px-Constructions_and_scaffolding_at_the_Oosterdokseiland%2C_Amsterdam-Centrum.jpg", // Building under construction surrounded by heavy scaffolding and framework
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Hitachi_Zaxis_135US_Excavator_Digging_in_Section_7%2C_Shimin_Blvd%2C_Taipei_20141220.jpg/960px-Hitachi_Zaxis_135US_Excavator_Digging_in_Section_7%2C_Shimin_Blvd%2C_Taipei_20141220.jpg", // Heavy excavator digging foundations on active site
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Crane_at_construction_site_-_geograph.org.uk_-_7593527.jpg/960px-Crane_at_construction_site_-_geograph.org.uk_-_7593527.jpg", // Heavy yellow crane at structural construction site
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/Tower_crane_at_a_building_construction_site_in_Taichung_2023-05-13_03.jpg/960px-Tower_crane_at_a_building_construction_site_in_Taichung_2023-05-13_03.jpg", // Concrete tower structure under construction with crane
+  "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Large_scaffoldings_on_the_construction_site_of_the_new_Library_at_Oosterdokseiland%2C_Amsterdam-Centrum%2C_2006.jpg/960px-Large_scaffoldings_on_the_construction_site_of_the_new_Library_at_Oosterdokseiland%2C_Amsterdam-Centrum%2C_2006.jpg", // Multi-story building construction scaffolding
+  "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=800&auto=format&fit=crop", // Construction site blueprints, plans & architectural layout
+];
+
+// Specific mappings for known demo projects for thematic alignment with active construction sites
+const SPECIFIC_PROJECT_IMAGE_MAP: Record<string, string> = {
+  "p1": PROJECT_IMAGES_POOL[0], // Green Valley Residency -> Active residential high-rise building under construction with tower crane
+  "prj-001": PROJECT_IMAGES_POOL[0],
+  "p2": PROJECT_IMAGES_POOL[1], // Skyline Towers -> High-rise commercial tower site with workers & rebar
+  "prj-002": PROJECT_IMAGES_POOL[1],
+  "p3": PROJECT_IMAGES_POOL[2], // Metro Express Highway Flyover -> Bridge & highway flyover civil engineering construction
+  "prj-003": PROJECT_IMAGES_POOL[2],
+  "p4": PROJECT_IMAGES_POOL[3], // Sunrise Industrial Warehouse -> Industrial site construction worker with hardhat & safety gear
+  "prj-004": PROJECT_IMAGES_POOL[3],
+  "p5": PROJECT_IMAGES_POOL[4], // Palm Grove Luxury Villas -> Heavy excavator digging foundation on site
+  "prj-005": PROJECT_IMAGES_POOL[4],
+};
+
+/**
+ * Returns a distinct, appropriate construction/architectural image for each project.
+ */
+export function getProjectImageUrl(project?: { id?: string; project_code?: string; thumbnail_url?: string; name?: string } | null): string {
+  if (!project) return PROJECT_IMAGES_POOL[0];
+  if (project.thumbnail_url && project.thumbnail_url.trim().length > 0) {
+    return project.thumbnail_url;
+  }
+
+  const idKey = (project.id || "").toLowerCase();
+  const codeKey = (project.project_code || "").toLowerCase();
+
+  if (SPECIFIC_PROJECT_IMAGE_MAP[idKey]) return SPECIFIC_PROJECT_IMAGE_MAP[idKey];
+  if (SPECIFIC_PROJECT_IMAGE_MAP[codeKey]) return SPECIFIC_PROJECT_IMAGE_MAP[codeKey];
+
+  // Deterministic hash based on project id, code, or name to always pick a unique image from pool
+  const seedString = (project.project_code || project.id || project.name || "default").toLowerCase();
+  let hash = 0;
+  for (let i = 0; i < seedString.length; i++) {
+    hash = (hash << 5) - hash + seedString.charCodeAt(i);
+    hash |= 0;
+  }
+  const index = Math.abs(hash) % PROJECT_IMAGES_POOL.length;
+  return PROJECT_IMAGES_POOL[index];
+}
+

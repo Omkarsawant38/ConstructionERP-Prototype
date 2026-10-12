@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { formatCurrencyFull, formatDateShort } from "@/lib/utils";
+import { formatCurrencyFull, formatDateShort, getProjectImageUrl } from "@/lib/utils";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Calendar, Clock, AlertTriangle, CheckCircle2, TrendingUp } from "lucide-react";
 import type { Project } from "@/types";
@@ -62,7 +62,7 @@ export default function ProjectOverviewTab({ project, onNavigateToTasks }: Proje
           <div 
             className="h-64 bg-gray-200"
             style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2000&auto=format&fit=crop')",
+              backgroundImage: `url('${getProjectImageUrl(project)}')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundColor: '#e5e7eb' // Fallback color

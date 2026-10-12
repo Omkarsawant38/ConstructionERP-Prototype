@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { demoProjects } from "@/lib/demo-data";
 import { createClient } from "@/lib/supabase/client";
-import type { Project, ProjectFormData } from "@/types";
+import type { Project, ProjectFormData, ProjectHealthStatus } from "@/types";
 
 const LOCAL_STORAGE_KEY = "construction_erp_custom_projects";
 const UPDATE_EVENT = "construction_erp_projects_updated";
@@ -93,6 +93,154 @@ export function updateProjectExpensesTotal(projectIdOrCode: string, amountToAdd:
       saveCustomProjects([cloned, ...custom]);
     }
   }
+}
+
+/**
+ * Update an existing project
+ */
+export async function updateProject(
+  idOrCode: string,
+  updates: Partial<ProjectFormData & { progress?: number; health_status?: ProjectHealthStatus }>,
+  fallbackProject?: Project
+): Promise<Project | null> {
+  if (typeof window === "undefined") return null;
+
+  const custom = getCustomProjects();
+  const index = custom.findIndex(
+    p => p.id === idOrCode || (p.project_code && p.project_code.toLowerCase() === idOrCode.toLowerCase())
+  );
+
+  let updatedProject: Project;
+
+  if (index >= 0) {
+    const existing = custom[index];
+    const newBudget = updates.approved_budget !== undefined ? Number(updates.approved_budget) : existing.approved_budget;
+    const actualExpenses = existing.actual_expenses || 0;
+    const newRemaining = Math.max(0, newBudget - actualExpenses);
+
+    updatedProject = {
+      ...existing,
+      ...updates,
+      health_status: (updates.health_status || existing.health_status) as ProjectHealthStatus,
+      approved_budget: newBudget,
+      remaining_budget: newRemaining,
+      updated_at: new Date().toISOString(),
+    };
+
+    const newCustom = [...custom];
+    newCustom[index] = updatedProject;
+    saveCustomProjects(newCustom);
+  } else {
+    // 1. Try finding in demoProjects
+    const demo = demoProjects.find(
+      p => p.id === idOrCode || (p.project_code && p.project_code.toLowerCase() === idOrCode.toLowerCase())
+    );
+
+    // 2. Base project: fallbackProject > demo
+    const base = fallbackProject || demo;
+
+    if (base) {
+      const newBudget = updates.approved_budget !== undefined ? Number(updates.approved_budget) : (base.approved_budget || 0);
+      const actualExpenses = base.actual_expenses || 0;
+      const newRemaining = Math.max(0, newBudget - actualExpenses);
+
+      updatedProject = {
+        ...base,
+        ...updates,
+        health_status: (updates.health_status || base.health_status || "on-track") as ProjectHealthStatus,
+        approved_budget: newBudget,
+        remaining_budget: newRemaining,
+        updated_at: new Date().toISOString(),
+      };
+
+      saveCustomProjects([updatedProject, ...custom]);
+    } else {
+      // 3. Fallback: query Supabase if available
+      try {
+        const supabase = createClient();
+        const { data: dbProj } = await supabase.from("projects").select("*").eq("id", idOrCode).maybeSingle();
+        if (dbProj) {
+          const newBudget = updates.approved_budget !== undefined ? Number(updates.approved_budget) : (Number(dbProj.approved_budget) || 0);
+          const actualExpenses = Number(dbProj.actual_expenses) || 0;
+          const newRemaining = Math.max(0, newBudget - actualExpenses);
+
+          updatedProject = {
+            id: dbProj.id,
+            project_code: updates.project_code || dbProj.project_code || "PRJ-000",
+            name: updates.name || dbProj.name,
+            description: updates.description !== undefined ? updates.description : (dbProj.description || ""),
+            client_name: updates.client_name !== undefined ? updates.client_name : (dbProj.client_name || ""),
+            project_type: updates.project_type || dbProj.project_type || "Residential",
+            construction_category: updates.construction_category || dbProj.construction_category || "High-Rise",
+            site_address: updates.site_address !== undefined ? updates.site_address : (dbProj.site_address || ""),
+            city: updates.city !== undefined ? updates.city : (dbProj.city || ""),
+            state: updates.state !== undefined ? updates.state : (dbProj.state || "Maharashtra"),
+            postal_code: updates.postal_code !== undefined ? updates.postal_code : (dbProj.postal_code || ""),
+            start_date: updates.start_date || dbProj.start_date || "",
+            end_date: updates.end_date || dbProj.end_date || "",
+            actual_end_date: updates.actual_end_date || dbProj.actual_end_date || "",
+            approved_budget: newBudget,
+            currency: dbProj.currency || "INR",
+            financial_notes: updates.financial_notes !== undefined ? updates.financial_notes : (dbProj.financial_notes || ""),
+            project_manager_name: updates.project_manager_name || dbProj.project_manager_name || "Unassigned",
+            status: (updates.status || dbProj.status || "planning") as any,
+            health_status: (updates.health_status || dbProj.health_status || "on-track") as any,
+            progress: updates.progress ?? dbProj.progress ?? 0,
+            organization_id: dbProj.organization_id || "org1",
+            created_by: dbProj.created_by || "user1",
+            created_at: dbProj.created_at || new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            actual_expenses: actualExpenses,
+            remaining_budget: newRemaining,
+            tasks_count: 0,
+            completed_tasks: 0,
+            milestones_count: 0,
+            completed_milestones: 0,
+          };
+
+          saveCustomProjects([updatedProject, ...custom]);
+        } else {
+          return null;
+        }
+      } catch {
+        return null;
+      }
+    }
+  }
+
+  // Attempt Supabase update
+  try {
+    const supabase = createClient();
+    const supabasePayload: Record<string, any> = {};
+    if (updates.name !== undefined) supabasePayload.name = updates.name;
+    if (updates.project_code !== undefined) supabasePayload.project_code = updates.project_code;
+    if (updates.description !== undefined) supabasePayload.description = updates.description;
+    if (updates.client_name !== undefined) supabasePayload.client_name = updates.client_name;
+    if (updates.project_type !== undefined) supabasePayload.project_type = updates.project_type;
+    if (updates.construction_category !== undefined) supabasePayload.construction_category = updates.construction_category;
+    if (updates.site_address !== undefined) supabasePayload.site_address = updates.site_address;
+    if (updates.city !== undefined) supabasePayload.city = updates.city;
+    if (updates.state !== undefined) supabasePayload.state = updates.state;
+    if (updates.postal_code !== undefined) supabasePayload.postal_code = updates.postal_code;
+    if (updates.start_date !== undefined) supabasePayload.start_date = updates.start_date;
+    if (updates.end_date !== undefined) supabasePayload.end_date = updates.end_date;
+    if (updates.approved_budget !== undefined) supabasePayload.approved_budget = Number(updates.approved_budget);
+    if (updates.status !== undefined) supabasePayload.status = updates.status;
+    if (updates.progress !== undefined) supabasePayload.progress = updates.progress;
+    if (updates.health_status !== undefined) supabasePayload.health_status = updates.health_status;
+    if (updates.project_manager_name !== undefined) supabasePayload.project_manager_name = updates.project_manager_name;
+    if (updates.financial_notes !== undefined) supabasePayload.financial_notes = updates.financial_notes;
+    supabasePayload.updated_at = new Date().toISOString();
+
+    await supabase
+      .from("projects")
+      .update(supabasePayload)
+      .eq("id", updatedProject.id);
+  } catch (err) {
+    console.warn("Supabase project update warning:", err);
+  }
+
+  return updatedProject;
 }
 
 /**

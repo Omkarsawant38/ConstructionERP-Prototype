@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useProjects } from "@/lib/projectStore";
-import { formatCurrencyFull, formatDateShort } from "@/lib/utils";
+import { formatCurrencyFull, formatDateShort, getProjectImageUrl } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { CircularProgress } from "@/components/ui/CircularProgress";
@@ -281,7 +281,7 @@ export default function ProjectsPage() {
                 className="h-32 bg-gray-200 relative flex flex-col justify-between"
                 style={{
                   padding: "16px",
-                  backgroundImage: "url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=600&auto=format&fit=crop')",
+                  backgroundImage: `url('${getProjectImageUrl(project)}')`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}

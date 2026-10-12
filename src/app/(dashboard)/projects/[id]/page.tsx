@@ -16,15 +16,25 @@ import ProjectTasksTab from "./_components/ProjectTasksTab";
 import ProjectExpensesTab from "./_components/ProjectExpensesTab";
 import ProjectMaterialsTab from "./_components/ProjectMaterialsTab";
 import ProjectTeamTab from "./_components/ProjectTeamTab";
+import { EditProjectModal } from "@/components/projects/EditProjectModal";
+import { CheckCircle2 } from "lucide-react";
+import type { Project } from "@/types";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
-  const { projects, loading } = useProjects();
+  const { projects, loading, refreshProjects } = useProjects();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [localProjectOverride, setLocalProjectOverride] = useState<Project | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   // Find project
-  const project = projects.find(p => p.id === id || p.project_code.toLowerCase() === (typeof id === "string" ? id.toLowerCase() : ""));
+  const foundProject = projects.find(
+    p => p.id === id || p.project_code.toLowerCase() === (typeof id === "string" ? id.toLowerCase() : "")
+  );
+
+  const project = localProjectOverride || foundProject;
 
   if (!project && loading) {
     return (
@@ -57,6 +67,13 @@ export default function ProjectDetailsPage() {
 
   return (
     <div className="flex flex-col gap-6 pb-12" style={{ gap: "24px" }}>
+      {feedback && (
+        <div className="p-4 rounded-xl flex items-center gap-3 border text-sm font-medium bg-emerald-50 text-emerald-800 border-emerald-200 shadow-sm animate-in fade-in">
+          <CheckCircle2 size={18} className="text-emerald-600" />
+          <span>{feedback}</span>
+        </div>
+      )}
+
       <PageHeader
         title={
           <div className="flex items-center gap-3">
@@ -70,7 +87,12 @@ export default function ProjectDetailsPage() {
           { label: project.name }
         ]}
         actions={
-          <button className="btn btn-primary" style={{ background: "var(--color-primary)" }}>
+          <button 
+            type="button"
+            onClick={() => setIsEditModalOpen(true)}
+            className="btn btn-primary cursor-pointer shadow-sm hover:brightness-105 transition-all" 
+            style={{ background: "var(--color-primary)" }}
+          >
             <Edit size={16} />
             <span className="hidden sm:inline">Edit Project</span>
           </button>
@@ -128,6 +150,19 @@ export default function ProjectDetailsPage() {
         {activeTab === "materials" && <ProjectMaterialsTab project={project} />}
         {activeTab === "team" && <ProjectTeamTab project={project} />}
       </div>
+
+      {/* Edit Project Modal */}
+      <EditProjectModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        project={project}
+        onSuccess={(updatedProject) => {
+          setLocalProjectOverride(updatedProject);
+          refreshProjects();
+          setFeedback(`Project "${updatedProject.name}" updated successfully!`);
+          setTimeout(() => setFeedback(null), 4000);
+        }}
+      />
     </div>
   );
 }
