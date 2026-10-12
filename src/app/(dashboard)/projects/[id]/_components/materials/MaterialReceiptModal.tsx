@@ -184,49 +184,157 @@ export function MaterialReceiptModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs overflow-y-auto animate-fade-in">
-      <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden my-8">
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: "rgba(15, 23, 42, 0.65)",
+        backdropFilter: "blur(4px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        overflowY: "auto",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "18px",
+          width: "100%",
+          maxWidth: "740px",
+          maxHeight: "92vh",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 20px 40px -15px rgba(0,0,0,0.25)",
+          border: "1px solid #E2E8F0",
+          overflow: "hidden",
+        }}
+      >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-amber-50/50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-100 text-green-700 flex items-center justify-center font-bold">
-              <PackageCheck size={20} />
+        <div
+          style={{
+            padding: "20px 28px",
+            borderBottom: "1px solid #E2E8F0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: "#F8FAFC",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div
+              style={{
+                width: "42px",
+                height: "42px",
+                borderRadius: "10px",
+                backgroundColor: "#DCFCE7",
+                color: "#15803D",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <PackageCheck size={22} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Record Material Receipt (GRN)</h2>
-              <p className="text-xs text-gray-500">
-                Project: <span className="font-semibold text-gray-700">{projectCode}</span> — {projectName}
+              <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#0F172A", margin: 0 }}>
+                Record Material Receipt (GRN)
+              </h3>
+              <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
+                Project: <strong style={{ color: "#D97706" }}>{projectCode}</strong> — {projectName}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-white/80 transition-colors"
+            disabled={submitting}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#94A3B8",
+              cursor: "pointer",
+              padding: "6px",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <div className="p-6 overflow-y-auto space-y-5 flex-1">
+        {/* Form Form & Scrollable Content */}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", overflow: "hidden", flex: 1 }}>
+          <div
+            style={{
+              padding: "24px 28px",
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+            }}
+          >
             {errorMsg && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center gap-2">
-                <AlertCircle size={16} className="shrink-0" />
+              <div
+                style={{
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  backgroundColor: "#FEF2F2",
+                  border: "1px solid #FECACA",
+                  color: "#991B1B",
+                  fontSize: "13px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <AlertCircle size={16} />
                 <span>{errorMsg}</span>
               </div>
             )}
 
             {/* Optional Request Link */}
-            <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-lg">
-              <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                <LinkIcon size={13} className="text-amber-600" />
+            <div
+              style={{
+                padding: "14px 16px",
+                backgroundColor: "#F8FAFC",
+                border: "1px solid #E2E8F0",
+                borderRadius: "12px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+              }}
+            >
+              <label
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  color: "#475569",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <LinkIcon size={14} style={{ color: "#D97706" }} />
                 <span>Link to Approved Material Request (Optional)</span>
               </label>
               <select
                 value={selectedRequestId}
                 onChange={(e) => setSelectedRequestId(e.target.value)}
-                className="form-input text-xs w-full py-2 bg-white"
+                style={{
+                  width: "100%",
+                  height: "42px",
+                  padding: "0 14px",
+                  borderRadius: "10px",
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "13px",
+                  color: "#0F172A",
+                  outline: "none",
+                }}
               >
                 <option value="">-- Direct Delivery without Indent / Ad-hoc Receipt --</option>
                 {eligibleRequests.map((r) => (
@@ -237,16 +345,27 @@ export function MaterialReceiptModal({
               </select>
             </div>
 
-            {/* Material & Date */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Material & Receipt Date */}
+            <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: "16px" }}>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Material Catalogue Item *
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                  Material Catalogue Item <span style={{ color: "#EF4444" }}>*</span>
                 </label>
                 <select
                   value={selectedMaterialId}
                   onChange={(e) => handleMaterialChange(e.target.value)}
-                  className="form-input text-sm w-full py-2 font-medium"
+                  style={{
+                    width: "100%",
+                    height: "42px",
+                    padding: "0 14px",
+                    borderRadius: "10px",
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "#0F172A",
+                    outline: "none",
+                  }}
                 >
                   {catalogue.map((mat) => (
                     <option key={mat.id} value={mat.id}>
@@ -257,116 +376,271 @@ export function MaterialReceiptModal({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Receipt Date (Stock Inward) *
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                  Receipt Date (Stock Inward) <span style={{ color: "#EF4444" }}>*</span>
                 </label>
-                <div className="relative">
+                <div style={{ position: "relative" }}>
+                  <Calendar
+                    size={16}
+                    style={{
+                      position: "absolute",
+                      left: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: "#94A3B8",
+                      pointerEvents: "none",
+                    }}
+                  />
                   <input
                     type="date"
+                    required
                     value={receiptDate}
                     onChange={(e) => setReceiptDate(e.target.value)}
-                    className="form-input text-sm w-full py-2 pl-9"
+                    style={{
+                      width: "100%",
+                      height: "42px",
+                      paddingLeft: "38px",
+                      paddingRight: "14px",
+                      borderRadius: "10px",
+                      border: "1px solid #CBD5E1",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "13px",
+                      color: "#0F172A",
+                      outline: "none",
+                    }}
                   />
-                  <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
               </div>
             </div>
 
-            {/* Quantity, Rate & Total Cost */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-amber-50/40 rounded-lg border border-amber-100">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Quantity Received ({currentUnit}) *
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  min="0.01"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  className="form-input text-sm w-full py-2 font-bold text-gray-900"
-                />
-              </div>
+            {/* Quantity, Rate & Total Value Box */}
+            <div
+              style={{
+                padding: "18px 20px",
+                borderRadius: "14px",
+                border: "1px solid #FDE68A",
+                backgroundColor: "#FFFBEB",
+                display: "flex",
+                flexDirection: "column",
+                gap: "14px",
+              }}
+            >
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1.2fr", gap: "14px" }}>
+                {/* Quantity */}
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#78350F", marginBottom: "6px" }}>
+                    Quantity Received ({currentUnit}) <span style={{ color: "#EF4444" }}>*</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0.01"
+                    required
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    style={{
+                      width: "100%",
+                      height: "42px",
+                      padding: "0 14px",
+                      borderRadius: "10px",
+                      border: "1px solid #FCD34D",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "14px",
+                      fontWeight: 700,
+                      color: "#0F172A",
+                      outline: "none",
+                    }}
+                  />
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Unit Cost (₹ / {currentUnit}) *
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  min="0"
-                  value={unitCost}
-                  onChange={(e) => setUnitCost(e.target.value)}
-                  className="form-input text-sm w-full py-2 text-gray-800"
-                />
-              </div>
+                {/* Unit Cost */}
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#78350F", marginBottom: "6px" }}>
+                    Unit Cost (₹ / {currentUnit}) <span style={{ color: "#EF4444" }}>*</span>
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#94A3B8",
+                        fontWeight: 700,
+                        fontSize: "13px",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      step="any"
+                      min="0"
+                      required
+                      value={unitCost}
+                      onChange={(e) => setUnitCost(e.target.value)}
+                      style={{
+                        width: "100%",
+                        height: "42px",
+                        paddingLeft: "28px",
+                        paddingRight: "14px",
+                        borderRadius: "10px",
+                        border: "1px solid #FCD34D",
+                        backgroundColor: "#FFFFFF",
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        color: "#0F172A",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Goods Received Value
-                </label>
-                <div className="h-9 px-3 bg-white border border-gray-200 rounded-lg flex items-center font-bold text-amber-700 text-sm">
-                  {formatCurrencyFull(calculatedTotalCost)}
+                {/* Goods Received Value */}
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#78350F", marginBottom: "6px" }}>
+                    Goods Received Value
+                  </label>
+                  <div
+                    style={{
+                      height: "42px",
+                      padding: "0 14px",
+                      backgroundColor: "#FFFFFF",
+                      border: "1px solid #FCD34D",
+                      borderRadius: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      fontWeight: 800,
+                      fontSize: "15px",
+                      color: "#B45309",
+                    }}
+                  >
+                    {formatCurrencyFull(calculatedTotalCost)}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Supplier & Reference */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Supplier & Ref # */}
+            <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: "16px" }}>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Supplier / Vendor / Quarry Source *
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                  Supplier / Vendor / Quarry Source <span style={{ color: "#EF4444" }}>*</span>
                 </label>
-                <div className="relative">
+                <div style={{ position: "relative" }}>
+                  <Truck
+                    size={16}
+                    style={{
+                      position: "absolute",
+                      left: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: "#94A3B8",
+                      pointerEvents: "none",
+                    }}
+                  />
                   <input
                     type="text"
-                    placeholder="e.g. Ultratech Building Solutions"
+                    required
+                    placeholder="e.g. Sahyadri Aggregate Supplies"
                     value={supplierName}
                     onChange={(e) => setSupplierName(e.target.value)}
-                    className="form-input text-sm w-full py-2 pl-9"
+                    style={{
+                      width: "100%",
+                      height: "42px",
+                      paddingLeft: "38px",
+                      paddingRight: "14px",
+                      borderRadius: "10px",
+                      border: "1px solid #CBD5E1",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "13px",
+                      color: "#0F172A",
+                      outline: "none",
+                    }}
                   />
-                  <Truck size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                   Challan / PO / Invoice Ref #
                 </label>
-                <div className="relative">
+                <div style={{ position: "relative" }}>
+                  <Hash
+                    size={16}
+                    style={{
+                      position: "absolute",
+                      left: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: "#94A3B8",
+                      pointerEvents: "none",
+                    }}
+                  />
                   <input
                     type="text"
                     placeholder="e.g. DC-98432 or PO-2025-01"
                     value={referenceNumber}
                     onChange={(e) => setReferenceNumber(e.target.value)}
-                    className="form-input text-sm w-full py-2 pl-9"
+                    style={{
+                      width: "100%",
+                      height: "42px",
+                      paddingLeft: "38px",
+                      paddingRight: "14px",
+                      borderRadius: "10px",
+                      border: "1px solid #CBD5E1",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "13px",
+                      color: "#0F172A",
+                      outline: "none",
+                    }}
                   />
-                  <Hash size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
               </div>
             </div>
 
-            {/* Unloading Location & Remarks */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Unloading Location & Attachment URL */}
+            <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: "16px" }}>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                   Site Unloading Location
                 </label>
-                <div className="relative">
+                <div style={{ position: "relative" }}>
+                  <MapPin
+                    size={16}
+                    style={{
+                      position: "absolute",
+                      left: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: "#94A3B8",
+                      pointerEvents: "none",
+                    }}
+                  />
                   <input
                     type="text"
-                    placeholder="e.g. Central Site Yard / Tower B Staging"
+                    placeholder="e.g. Main Project Site Yard"
                     value={sourceOrLocation}
                     onChange={(e) => setSourceOrLocation(e.target.value)}
-                    className="form-input text-xs w-full py-2 pl-8"
+                    style={{
+                      width: "100%",
+                      height: "42px",
+                      paddingLeft: "38px",
+                      paddingRight: "14px",
+                      borderRadius: "10px",
+                      border: "1px solid #CBD5E1",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "13px",
+                      color: "#0F172A",
+                      outline: "none",
+                    }}
                   />
-                  <MapPin size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                   Delivery Challan Attachment URL (Optional)
                 </label>
                 <input
@@ -374,13 +648,24 @@ export function MaterialReceiptModal({
                   placeholder="https://... or scan photo url"
                   value={attachmentUrl}
                   onChange={(e) => setAttachmentUrl(e.target.value)}
-                  className="form-input text-xs w-full py-2"
+                  style={{
+                    width: "100%",
+                    height: "42px",
+                    padding: "0 14px",
+                    borderRadius: "10px",
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    fontSize: "13px",
+                    color: "#0F172A",
+                    outline: "none",
+                  }}
                 />
               </div>
             </div>
 
+            {/* Quality Inspection / Condition Notes */}
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                 Quality Inspection / Condition Notes
               </label>
               <textarea
@@ -388,29 +673,72 @@ export function MaterialReceiptModal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Inspected by site engineer, batch tested, verified weighbridge slip..."
-                className="form-input text-xs w-full"
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  borderRadius: "10px",
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "13px",
+                  color: "#0F172A",
+                  outline: "none",
+                  resize: "vertical",
+                }}
               />
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span className="text-xs text-gray-500">
+          {/* Modal Actions Footer */}
+          <div
+            style={{
+              padding: "16px 28px",
+              borderTop: "1px solid #E2E8F0",
+              backgroundColor: "#F8FAFC",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "16px",
+            }}
+          >
+            <span style={{ fontSize: "12px", color: "#64748B" }}>
               Receipt increases project site inventory immediately.
             </span>
-            <div className="flex items-center gap-3">
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <button
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                className="btn btn-secondary text-sm py-2 px-4"
+                style={{
+                  padding: "9px 20px",
+                  borderRadius: "10px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid #CBD5E1",
+                  color: "#475569",
+                  cursor: "pointer",
+                }}
               >
                 Cancel
               </button>
+
               <button
                 type="submit"
                 disabled={submitting}
-                className="btn btn-primary text-sm py-2 px-5 bg-green-600 hover:bg-green-700 text-white font-semibold flex items-center gap-2"
+                style={{
+                  padding: "9px 22px",
+                  borderRadius: "10px",
+                  backgroundColor: "#FFB000",
+                  color: "#0F172A",
+                  fontWeight: 700,
+                  fontSize: "13px",
+                  border: "none",
+                  cursor: submitting ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  boxShadow: "0 2px 6px rgba(255, 176, 0, 0.25)",
+                }}
               >
                 {submitting ? (
                   <>
@@ -419,7 +747,7 @@ export function MaterialReceiptModal({
                   </>
                 ) : (
                   <>
-                    <CheckCircle2 size={16} />
+                    <CheckCircle2 size={16} className="stroke-[2.5]" />
                     <span>Record Receipt (Stock In)</span>
                   </>
                 )}

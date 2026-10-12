@@ -14,6 +14,7 @@ import { formatDateShort, formatCurrencyFull } from "@/lib/utils";
 import ProjectOverviewTab from "./_components/ProjectOverviewTab";
 import ProjectTasksTab from "./_components/ProjectTasksTab";
 import ProjectExpensesTab from "./_components/ProjectExpensesTab";
+import ProjectIncomeTab from "./_components/ProjectIncomeTab";
 import ProjectMaterialsTab from "./_components/ProjectMaterialsTab";
 import ProjectTeamTab from "./_components/ProjectTeamTab";
 import { EditProjectModal } from "@/components/projects/EditProjectModal";
@@ -61,6 +62,7 @@ export default function ProjectDetailsPage() {
     { id: "overview", label: "Overview" },
     { id: "tasks", label: "Tasks" },
     { id: "expenses", label: "Expenses" },
+    { id: "income", label: "Income" },
     { id: "materials", label: "Materials" },
     { id: "team", label: "Team" },
   ];
@@ -147,6 +149,7 @@ export default function ProjectDetailsPage() {
         )}
         {activeTab === "tasks" && <ProjectTasksTab project={project} />}
         {activeTab === "expenses" && <ProjectExpensesTab project={project} />}
+        {activeTab === "income" && <ProjectIncomeTab project={project} />}
         {activeTab === "materials" && <ProjectMaterialsTab project={project} />}
         {activeTab === "team" && <ProjectTeamTab project={project} />}
       </div>

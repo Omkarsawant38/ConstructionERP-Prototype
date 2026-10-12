@@ -515,3 +515,45 @@ export interface TeamMemberFormData {
   notes?: string;
 }
 
+// ===== Project Income / Unit Ownership =====
+export type UnitPaymentStatus = "full_paid" | "partially_paid" | "booked" | "cancelled";
+
+export interface ProjectUnitIncome {
+  id: string;
+  project_id: string;
+  unit_number: string;          // e.g. "Flat A-101", "Tower 1 - 502", "Office 301"
+  unit_type: string;            // e.g. "2 BHK", "3 BHK", "Penthouse", "Commercial Shop", "Office"
+  floor?: string;               // e.g. "1st Floor", "5th Floor"
+  carpet_area_sqft?: number;    // e.g. 1150
+  owner_name: string;           // e.g. "Rajesh Kumar"
+  owner_phone?: string;
+  owner_email?: string;
+  total_amount: number;         // Agreed total sale price
+  received_amount: number;      // Amount received to date
+  pending_amount: number;       // total_amount - received_amount
+  status: UnitPaymentStatus;
+  booking_date: string;
+  payment_milestone?: string;   // e.g. "Slab 5 Completed", "Possession Stage", "Plinth Cast"
+  notes?: string;
+  is_sample?: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UnitIncomeFormData {
+  unit_number: string;
+  unit_type: string;
+  floor?: string;
+  carpet_area_sqft?: number;
+  owner_name: string;
+  owner_phone?: string;
+  owner_email?: string;
+  total_amount: number;
+  received_amount: number;
+  status: UnitPaymentStatus;
+  booking_date: string;
+  payment_milestone?: string;
+  notes?: string;
+}
+
+

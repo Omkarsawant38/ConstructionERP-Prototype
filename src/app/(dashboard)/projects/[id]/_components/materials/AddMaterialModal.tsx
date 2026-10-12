@@ -193,183 +193,358 @@ export function AddMaterialModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn">
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: "rgba(15, 23, 42, 0.65)",
+        backdropFilter: "blur(4px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        overflowY: "auto",
+      }}
+    >
       <div
-        className="w-full max-w-2xl rounded-2xl shadow-2xl border flex flex-col max-h-[92vh] overflow-hidden"
         style={{
-          background: "var(--color-card, #FFFFFF)",
-          borderColor: "var(--color-border, #E5E7EB)",
+          backgroundColor: "#FFFFFF",
+          borderRadius: "18px",
+          width: "100%",
+          maxWidth: "720px",
+          maxHeight: "92vh",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 20px 40px -15px rgba(0,0,0,0.25)",
+          border: "1px solid #E2E8F0",
+          overflow: "hidden",
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-stone-50/70">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shadow-xs">
+        <div
+          style={{
+            padding: "20px 28px",
+            borderBottom: "1px solid #E2E8F0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: "#F8FAFC",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Package size={20} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900">Add New Material</h3>
-              <p className="text-xs text-gray-500">
+              <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#0F172A", margin: 0 }}>
+                Add New Material
+              </h3>
+              <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
                 Register material into catalogue and allocate for{" "}
-                <span className="font-semibold text-amber-800">{projectCode}</span>
+                <strong style={{ color: "#D97706" }}>{projectCode}</strong>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+            disabled={loading}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#94A3B8",
+              cursor: "pointer",
+              padding: "6px",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
-          {errorMsg && (
-            <div className="p-3.5 rounded-xl bg-red-50 text-red-800 border border-red-200 text-xs flex items-center gap-2">
-              <AlertCircle size={16} className="shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
+        {/* Form Form & Scrollable Content */}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", overflow: "hidden", flex: 1 }}>
+          <div
+            style={{
+              padding: "24px 28px",
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+            }}
+          >
+            {errorMsg && (
+              <div
+                style={{
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  backgroundColor: "#FEF2F2",
+                  border: "1px solid #FECACA",
+                  color: "#991B1B",
+                  fontSize: "13px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <AlertCircle size={16} />
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
-          {/* Section 1: Item Core Details */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                Material Item Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="e.g., Ultratech PPC Cement 50kg, Tata Tiscon TMT 16mm, River Sand"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-                style={{ background: "var(--color-bg-primary, #FAFAF9)" }}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Section 1: Item Core Details */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                  Category <span className="text-red-500">*</span>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                  Material Item Name <span style={{ color: "#EF4444" }}>*</span>
                 </label>
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-                  style={{ background: "var(--color-bg-primary, #FAFAF9)" }}
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g., Ultratech PPC Cement 50kg, Tata Tiscon TMT 16mm, River Sand"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  style={{
+                    width: "100%",
+                    height: "42px",
+                    padding: "0 14px",
+                    borderRadius: "10px",
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    fontSize: "13px",
+                    color: "#0F172A",
+                    outline: "none",
+                  }}
+                />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                  Unit of Measurement <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-2">
+              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                    Category <span style={{ color: "#EF4444" }}>*</span>
+                  </label>
                   <select
-                    value={unit}
-                    onChange={(e) => setUnit(e.target.value)}
-                    className="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-                    style={{ background: "var(--color-bg-primary, #FAFAF9)" }}
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    style={{
+                      width: "100%",
+                      height: "42px",
+                      padding: "0 12px",
+                      borderRadius: "10px",
+                      border: "1px solid #CBD5E1",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "13px",
+                      color: "#0F172A",
+                      outline: "none",
+                    }}
                   >
-                    {COMMON_UNITS.map((u) => (
-                      <option key={u} value={u}>
-                        {u}
+                    {CATEGORIES.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.label}
                       </option>
                     ))}
-                    <option value="other">Other (Custom unit)</option>
                   </select>
-                  {unit === "other" && (
-                    <input
-                      type="text"
-                      placeholder="e.g. bundle"
-                      value={customUnit}
-                      onChange={(e) => setCustomUnit(e.target.value)}
-                      className="w-28 px-3 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    />
-                  )}
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                    Unit of Measurement <span style={{ color: "#EF4444" }}>*</span>
+                  </label>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <select
+                      value={unit}
+                      onChange={(e) => setUnit(e.target.value)}
+                      style={{
+                        flex: 1,
+                        height: "42px",
+                        padding: "0 12px",
+                        borderRadius: "10px",
+                        border: "1px solid #CBD5E1",
+                        backgroundColor: "#FFFFFF",
+                        fontSize: "13px",
+                        color: "#0F172A",
+                        outline: "none",
+                      }}
+                    >
+                      {COMMON_UNITS.map((u) => (
+                        <option key={u} value={u}>
+                          {u}
+                        </option>
+                      ))}
+                      <option value="other">Other (Custom unit)</option>
+                    </select>
+                    {unit === "other" && (
+                      <input
+                        type="text"
+                        placeholder="e.g. bundle"
+                        value={customUnit}
+                        onChange={(e) => setCustomUnit(e.target.value)}
+                        style={{
+                          width: "110px",
+                          height: "42px",
+                          padding: "0 10px",
+                          borderRadius: "10px",
+                          border: "1px solid #CBD5E1",
+                          fontSize: "13px",
+                          outline: "none",
+                        }}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Section 2: Pricing & Stock Levels */}
-          <div className="p-4 rounded-xl border border-stone-200/80 bg-stone-50/50 space-y-4">
-            <span className="text-xs font-bold text-gray-600 uppercase tracking-wider block">
-              Pricing & Inventory Controls
-            </span>
+            {/* Section 2: Pricing & Inventory Controls Box */}
+            <div
+              style={{
+                padding: "18px 20px",
+                borderRadius: "14px",
+                border: "1px solid #E2E8F0",
+                backgroundColor: "#F8FAFC",
+                display: "flex",
+                flexDirection: "column",
+                gap: "16px",
+              }}
+            >
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                Pricing & Inventory Controls
+              </span>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                  Standard Rate (₹ / {unit})
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-bold">
-                    ₹
-                  </span>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "14px" }}>
+                {/* Standard Rate */}
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>
+                    Standard Rate (₹ / {unit})
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#94A3B8",
+                        fontWeight: 700,
+                        fontSize: "13px",
+                      }}
+                    >
+                      ₹
+                    </span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={unitPrice}
+                      onChange={(e) => setUnitPrice(e.target.value)}
+                      style={{
+                        width: "100%",
+                        height: "40px",
+                        paddingLeft: "28px",
+                        paddingRight: "10px",
+                        borderRadius: "10px",
+                        border: "1px solid #CBD5E1",
+                        backgroundColor: "#FFFFFF",
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        color: "#0F172A",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Warehouse Stock */}
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>
+                    Warehouse Stock
+                  </label>
                   <input
                     type="number"
                     min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={unitPrice}
-                    onChange={(e) => setUnitPrice(e.target.value)}
-                    className="w-full pl-7 pr-3 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white"
+                    step="0.1"
+                    placeholder="0"
+                    value={currentStock}
+                    onChange={(e) => setCurrentStock(e.target.value)}
+                    style={{
+                      width: "100%",
+                      height: "40px",
+                      padding: "0 12px",
+                      borderRadius: "10px",
+                      border: "1px solid #CBD5E1",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "#0F172A",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+
+                {/* Low Stock Alert */}
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#475569", marginBottom: "6px" }}>
+                    Low Stock Alert Level
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    placeholder="20"
+                    value={reorderLevel}
+                    onChange={(e) => setReorderLevel(e.target.value)}
+                    style={{
+                      width: "100%",
+                      height: "40px",
+                      padding: "0 12px",
+                      borderRadius: "10px",
+                      border: "1px solid #CBD5E1",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "#0F172A",
+                      outline: "none",
+                    }}
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                  Warehouse Stock
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  placeholder="0"
-                  value={currentStock}
-                  onChange={(e) => setCurrentStock(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                  Low Stock Alert Level
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.1"
-                  placeholder="20"
-                  value={reorderLevel}
-                  onChange={(e) => setReorderLevel(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white"
-                />
-              </div>
-            </div>
-
-            {/* Initial Site Allocation */}
-            <div className="pt-2 border-t border-stone-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              {/* Initial Site Allocation */}
+              <div
+                style={{
+                  paddingTop: "14px",
+                  borderTop: "1px solid #E2E8F0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "16px",
+                  flexWrap: "wrap",
+                }}
+              >
                 <div>
-                  <label className="text-xs font-semibold text-gray-800">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#0F172A" }}>
                     Opening Site Stock for {projectCode}
                   </label>
-                  <p className="text-[11px] text-gray-500">
+                  <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>
                     Directly allocate physical units currently available on this job site.
                   </p>
                 </div>
-                <div className="w-full sm:w-44">
+                <div style={{ width: "130px" }}>
                   <input
                     type="number"
                     min="0"
@@ -377,51 +552,100 @@ export function AddMaterialModal({
                     placeholder="0"
                     value={initialSiteStock}
                     onChange={(e) => setInitialSiteStock(e.target.value)}
-                    className="w-full px-3 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                    style={{
+                      width: "100%",
+                      height: "40px",
+                      padding: "0 12px",
+                      borderRadius: "10px",
+                      border: "1px solid #CBD5E1",
+                      backgroundColor: "#FFFFFF",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "#0F172A",
+                      textAlign: "right",
+                      outline: "none",
+                    }}
                   />
                 </div>
               </div>
             </div>
+
+            {/* Section 3: Supplier & Specs */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                  Primary Supplier / Vendor (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Tata Steel Distributors, UltraTech Building Solutions"
+                  value={supplierName}
+                  onChange={(e) => setSupplierName(e.target.value)}
+                  style={{
+                    width: "100%",
+                    height: "42px",
+                    padding: "0 14px",
+                    borderRadius: "10px",
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    fontSize: "13px",
+                    color: "#0F172A",
+                    outline: "none",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                  Notes / Technical Specification
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Grade, brand preference, batch testing standards, or storage precautions..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "10px",
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    fontSize: "13px",
+                    color: "#0F172A",
+                    outline: "none",
+                    resize: "vertical",
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Section 3: Supplier & Specs */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                Primary Supplier / Vendor (Optional)
-              </label>
-              <input
-                type="text"
-                placeholder="e.g., Tata Steel Distributors, UltraTech Building Solutions"
-                value={supplierName}
-                onChange={(e) => setSupplierName(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-                style={{ background: "var(--color-bg-primary, #FAFAF9)" }}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                Notes / Technical Specification
-              </label>
-              <textarea
-                rows={2}
-                placeholder="Grade, brand preference, batch testing standards, or storage precautions..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-3.5 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-                style={{ background: "var(--color-bg-primary, #FAFAF9)" }}
-              />
-            </div>
-          </div>
-
-          {/* Footer Controls */}
-          <div className="flex items-center justify-between pt-4 border-t">
+          {/* Modal Actions Footer */}
+          <div
+            style={{
+              padding: "16px 28px",
+              borderTop: "1px solid #E2E8F0",
+              backgroundColor: "#F8FAFC",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 rounded-xl text-xs font-semibold border text-gray-600 hover:bg-gray-50 transition"
+              className="btn btn-secondary"
+              style={{
+                padding: "9px 20px",
+                borderRadius: "10px",
+                fontSize: "13px",
+                fontWeight: 600,
+                backgroundColor: "#FFFFFF",
+                border: "1px solid #CBD5E1",
+                color: "#475569",
+                cursor: "pointer",
+              }}
             >
               Cancel
             </button>
@@ -429,17 +653,29 @@ export function AddMaterialModal({
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold text-stone-900 shadow-sm flex items-center gap-2 transition active:scale-95 disabled:opacity-50"
-              style={{ background: "#FFB000" }}
+              style={{
+                padding: "9px 22px",
+                borderRadius: "10px",
+                backgroundColor: "#FFB000",
+                color: "#0F172A",
+                fontWeight: 700,
+                fontSize: "13px",
+                border: "none",
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                boxShadow: "0 2px 6px rgba(255, 176, 0, 0.25)",
+              }}
             >
               {loading ? (
                 <>
-                  <Loader2 size={15} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin" />
                   <span>Saving Material...</span>
                 </>
               ) : (
                 <>
-                  <Plus size={15} className="stroke-[2.5]" />
+                  <Plus size={16} className="stroke-[2.5]" />
                   <span>Register Material</span>
                 </>
               )}

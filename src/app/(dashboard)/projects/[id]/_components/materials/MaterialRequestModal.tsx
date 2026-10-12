@@ -218,48 +218,138 @@ export function MaterialRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs overflow-y-auto animate-fade-in">
-      <div className="bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden my-8">
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: "rgba(15, 23, 42, 0.65)",
+        backdropFilter: "blur(4px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        overflowY: "auto",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#FFFFFF",
+          borderRadius: "18px",
+          width: "100%",
+          maxWidth: "860px",
+          maxHeight: "92vh",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 20px 40px -15px rgba(0,0,0,0.25)",
+          border: "1px solid #E2E8F0",
+          overflow: "hidden",
+        }}
+      >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-amber-50/50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
-              <Package size={20} />
+        <div
+          style={{
+            padding: "20px 28px",
+            borderBottom: "1px solid #E2E8F0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            backgroundColor: "#F8FAFC",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div
+              style={{
+                width: "42px",
+                height: "42px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF3C7",
+                color: "#D97706",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Package size={22} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Create Material Request</h2>
-              <p className="text-xs text-gray-500">
-                Project: <span className="font-semibold text-gray-700">{projectCode}</span> — {projectName}
+              <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#0F172A", margin: 0 }}>
+                Create Material Request
+              </h3>
+              <p style={{ fontSize: "12px", color: "#64748B", margin: "2px 0 0 0" }}>
+                Project: <strong style={{ color: "#D97706" }}>{projectCode}</strong> — {projectName}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-white/80 transition-colors"
+            disabled={submitting}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#94A3B8",
+              cursor: "pointer",
+              padding: "6px",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Form Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        {/* Scrollable Form Body */}
+        <div
+          style={{
+            padding: "24px 28px",
+            overflowY: "auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: "22px",
+            flex: 1,
+          }}
+        >
           {errorMsg && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center gap-2">
-              <AlertCircle size={16} className="shrink-0" />
+            <div
+              style={{
+                padding: "12px 16px",
+                borderRadius: "10px",
+                backgroundColor: "#FEF2F2",
+                border: "1px solid #FECACA",
+                color: "#991B1B",
+                fontSize: "13px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <AlertCircle size={16} />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          {/* Key Parameters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Key Parameters: Priority, Date, Location */}
+          <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr 1.3fr", gap: "16px" }}>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Priority Level *
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                Priority Level <span style={{ color: "#EF4444" }}>*</span>
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as any)}
-                className="form-input text-sm w-full py-2"
+                style={{
+                  width: "100%",
+                  height: "42px",
+                  padding: "0 12px",
+                  borderRadius: "10px",
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "13px",
+                  color: "#0F172A",
+                  outline: "none",
+                }}
               >
                 <option value="low">Low (Standard Routine)</option>
                 <option value="medium">Medium (Scheduled Pour/Task)</option>
@@ -269,74 +359,166 @@ export function MaterialRequestModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Required Delivery Date *
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                Required Delivery Date <span style={{ color: "#EF4444" }}>*</span>
               </label>
-              <div className="relative">
+              <div style={{ position: "relative" }}>
+                <Calendar
+                  size={16}
+                  style={{
+                    position: "absolute",
+                    left: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#94A3B8",
+                    pointerEvents: "none",
+                  }}
+                />
                 <input
                   type="date"
+                  required
                   value={requiredDate}
                   onChange={(e) => setRequiredDate(e.target.value)}
-                  className="form-input text-sm w-full py-2 pl-9"
+                  style={{
+                    width: "100%",
+                    height: "42px",
+                    paddingLeft: "38px",
+                    paddingRight: "12px",
+                    borderRadius: "10px",
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    fontSize: "13px",
+                    color: "#0F172A",
+                    outline: "none",
+                  }}
                 />
-                <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Site Delivery Location *
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
+                Site Delivery Location <span style={{ color: "#EF4444" }}>*</span>
               </label>
-              <div className="relative">
+              <div style={{ position: "relative" }}>
+                <MapPin
+                  size={16}
+                  style={{
+                    position: "absolute",
+                    left: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#94A3B8",
+                    pointerEvents: "none",
+                  }}
+                />
                 <input
                   type="text"
+                  required
                   placeholder="e.g. Tower B - Bay 4"
                   value={deliveryLocation}
                   onChange={(e) => setDeliveryLocation(e.target.value)}
-                  className="form-input text-sm w-full py-2 pl-9"
+                  style={{
+                    width: "100%",
+                    height: "42px",
+                    paddingLeft: "38px",
+                    paddingRight: "12px",
+                    borderRadius: "10px",
+                    border: "1px solid #CBD5E1",
+                    backgroundColor: "#FFFFFF",
+                    fontSize: "13px",
+                    color: "#0F172A",
+                    outline: "none",
+                  }}
                 />
-                <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               </div>
             </div>
           </div>
 
-          {/* Multi-item Table */}
-          <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-            <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
+          {/* Line Items Card */}
+          <div
+            style={{
+              border: "1px solid #E2E8F0",
+              borderRadius: "14px",
+              overflow: "hidden",
+              backgroundColor: "#FFFFFF",
+            }}
+          >
+            <div
+              style={{
+                padding: "14px 18px",
+                backgroundColor: "#F8FAFC",
+                borderBottom: "1px solid #E2E8F0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
               <div>
-                <h3 className="text-sm font-bold text-gray-900">Requested Material Line Items</h3>
-                <p className="text-xs text-gray-500">Select materials from catalogue and specify quantities</p>
+                <h4 style={{ fontSize: "13px", fontWeight: 700, color: "#0F172A", margin: 0 }}>
+                  Requested Material Line Items
+                </h4>
+                <p style={{ fontSize: "11px", color: "#64748B", margin: "2px 0 0 0" }}>
+                  Select materials from catalogue and specify quantities
+                </p>
               </div>
               <button
                 type="button"
                 onClick={handleAddItem}
-                className="btn btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 border-amber-300 text-amber-800 hover:bg-amber-50"
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  backgroundColor: "#FEF3C7",
+                  border: "1px solid #FCD34D",
+                  color: "#92400E",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
               >
                 <Plus size={14} />
                 <span>Add Item</span>
               </button>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-gray-100 text-gray-600 font-semibold border-b border-gray-200">
-                  <tr>
-                    <th className="py-2.5 px-3 w-1/3">Material from Catalogue *</th>
-                    <th className="py-2.5 px-3 w-28">Quantity *</th>
-                    <th className="py-2.5 px-3 w-20">Unit</th>
-                    <th className="py-2.5 px-3 w-28 text-right">Est. Rate</th>
-                    <th className="py-2.5 px-3">Notes</th>
-                    <th className="py-2.5 px-2 w-10 text-center"></th>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", textAlign: "left" }}>
+                <thead>
+                  <tr style={{ backgroundColor: "#F1F5F9", color: "#475569", fontWeight: 700, borderBottom: "1px solid #E2E8F0" }}>
+                    <th style={{ padding: "10px 14px", minWidth: "220px" }}>Material from Catalogue *</th>
+                    <th style={{ padding: "10px 14px", width: "100px" }}>Quantity *</th>
+                    <th style={{ padding: "10px 10px", width: "70px" }}>Unit</th>
+                    <th style={{ padding: "10px 14px", width: "110px", textAlign: "right" }}>Est. Rate</th>
+                    <th style={{ padding: "10px 14px" }}>Notes / Specific Purpose</th>
+                    <th style={{ padding: "10px 10px", width: "44px", textAlign: "center" }}></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody>
                   {items.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-amber-50/20">
-                      <td className="p-2">
+                    <tr
+                      key={idx}
+                      style={{
+                        borderBottom: "1px solid #F1F5F9",
+                        backgroundColor: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
+                      }}
+                    >
+                      <td style={{ padding: "10px 14px" }}>
                         <select
                           value={item.material_id}
                           onChange={(e) => handleMaterialChange(idx, e.target.value)}
-                          className="form-input text-xs w-full py-1.5"
+                          style={{
+                            width: "100%",
+                            height: "38px",
+                            padding: "0 10px",
+                            borderRadius: "8px",
+                            border: "1px solid #CBD5E1",
+                            backgroundColor: "#FFFFFF",
+                            fontSize: "12px",
+                            color: "#0F172A",
+                            outline: "none",
+                          }}
                         >
                           {catalogue.map((mat) => (
                             <option key={mat.id} value={mat.id}>
@@ -345,40 +527,70 @@ export function MaterialRequestModal({
                           ))}
                         </select>
                       </td>
-                      <td className="p-2">
+                      <td style={{ padding: "10px 14px" }}>
                         <input
                           type="number"
                           step="any"
                           min="0.01"
                           value={item.quantity}
                           onChange={(e) => handleQuantityChange(idx, e.target.value)}
-                          className="form-input text-xs w-full py-1.5 font-semibold text-gray-800"
                           placeholder="Qty"
+                          style={{
+                            width: "100%",
+                            height: "38px",
+                            padding: "0 10px",
+                            borderRadius: "8px",
+                            border: "1px solid #CBD5E1",
+                            backgroundColor: "#FFFFFF",
+                            fontSize: "13px",
+                            fontWeight: 700,
+                            color: "#0F172A",
+                            outline: "none",
+                          }}
                         />
                       </td>
-                      <td className="p-2 text-gray-500 font-medium whitespace-nowrap">
+                      <td style={{ padding: "10px 10px", color: "#64748B", fontWeight: 600 }}>
                         {item.unit}
                       </td>
-                      <td className="p-2 text-right font-medium text-gray-700 whitespace-nowrap">
+                      <td style={{ padding: "10px 14px", textAlign: "right", color: "#334155", fontWeight: 600 }}>
                         {formatCurrencyFull(item.estimated_unit_cost)}
                       </td>
-                      <td className="p-2">
+                      <td style={{ padding: "10px 14px" }}>
                         <input
                           type="text"
                           value={item.notes}
                           onChange={(e) => handleItemNotesChange(idx, e.target.value)}
                           placeholder="Grade, specs, or task"
-                          className="form-input text-xs w-full py-1.5"
+                          style={{
+                            width: "100%",
+                            height: "38px",
+                            padding: "0 10px",
+                            borderRadius: "8px",
+                            border: "1px solid #CBD5E1",
+                            backgroundColor: "#FFFFFF",
+                            fontSize: "12px",
+                            color: "#0F172A",
+                            outline: "none",
+                          }}
                         />
                       </td>
-                      <td className="p-2 text-center">
+                      <td style={{ padding: "10px 10px", textAlign: "center" }}>
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(idx)}
-                          className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "#94A3B8",
+                            cursor: "pointer",
+                            padding: "6px",
+                            borderRadius: "6px",
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = "#EF4444")}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
                           title="Remove item"
                         >
-                          <Trash2 size={15} />
+                          <Trash2 size={16} />
                         </button>
                       </td>
                     </tr>
@@ -387,24 +599,33 @@ export function MaterialRequestModal({
               </table>
             </div>
 
-            {/* Total Estimated Value */}
-            <div className="px-4 py-3 bg-gray-50/80 border-t border-gray-200 flex justify-between items-center text-xs">
-              <span className="text-gray-500 font-medium">
+            {/* Total Estimated Value Row */}
+            <div
+              style={{
+                padding: "12px 18px",
+                backgroundColor: "#FFFBEB",
+                borderTop: "1px solid #FDE68A",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span style={{ fontSize: "12px", color: "#78350F", fontWeight: 500 }}>
                 {items.length} line {items.length === 1 ? "item" : "items"} configured
               </span>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-600">Total Estimated Indent Value:</span>
-                <span className="font-bold text-amber-700 text-sm">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontSize: "12px", color: "#78350F" }}>Total Estimated Indent Value:</span>
+                <span style={{ fontSize: "15px", fontWeight: 800, color: "#92400E" }}>
                   {formatCurrencyFull(calculateTotalEstimatedCost())}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Request Notes & Attachment */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Notes & Attachments */}
+          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "16px" }}>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                 Site Justification / Notes
               </label>
               <textarea
@@ -412,11 +633,21 @@ export function MaterialRequestModal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Explain the scheduled activity, work order, or contractor requirement..."
-                className="form-input text-xs w-full"
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: "10px",
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "12px",
+                  color: "#0F172A",
+                  outline: "none",
+                  resize: "vertical",
+                }}
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
+              <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                 Attachment URL or Drawing Reference (Optional)
               </label>
               <input
@@ -424,28 +655,63 @@ export function MaterialRequestModal({
                 value={attachmentUrl}
                 onChange={(e) => setAttachmentUrl(e.target.value)}
                 placeholder="https://... or PO-REF-1234"
-                className="form-input text-xs w-full py-2"
+                style={{
+                  width: "100%",
+                  height: "42px",
+                  padding: "0 12px",
+                  borderRadius: "10px",
+                  border: "1px solid #CBD5E1",
+                  backgroundColor: "#FFFFFF",
+                  fontSize: "12px",
+                  color: "#0F172A",
+                  outline: "none",
+                }}
               />
-              <p className="text-[11px] text-gray-400 mt-1">
+              <p style={{ fontSize: "11px", color: "#94A3B8", margin: "4px 0 0 0" }}>
                 Link to bar bending schedule, pour plan, or supplier quote.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-xs text-gray-500 flex items-center gap-1.5">
-            <Clock size={14} className="text-amber-500" />
-            <span>Submitted requests route directly to the Project Manager for approval.</span>
+        {/* Modal Actions Footer */}
+        <div
+          style={{
+            padding: "16px 28px",
+            borderTop: "1px solid #E2E8F0",
+            backgroundColor: "#F8FAFC",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "16px",
+          }}
+        >
+          <div style={{ fontSize: "12px", color: "#64748B", display: "flex", alignItems: "center", gap: "6px", flex: 1, minWidth: 0 }}>
+            <Clock size={15} style={{ color: "#D97706", flexShrink: 0 }} />
+            <span>Submitted requests route directly to the PM for approval.</span>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
             <button
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="btn btn-secondary text-sm py-2 px-4"
+              style={{
+                height: "40px",
+                padding: "0 20px",
+                borderRadius: "10px",
+                fontSize: "13px",
+                fontWeight: 600,
+                backgroundColor: "#FFFFFF",
+                border: "1px solid #CBD5E1",
+                color: "#475569",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxSizing: "border-box",
+              }}
             >
               Cancel
             </button>
@@ -453,7 +719,22 @@ export function MaterialRequestModal({
               type="button"
               onClick={() => handleSubmit(true)}
               disabled={submitting}
-              className="btn btn-secondary text-sm py-2 px-4 border-gray-300"
+              style={{
+                height: "40px",
+                padding: "0 20px",
+                borderRadius: "10px",
+                fontSize: "13px",
+                fontWeight: 600,
+                backgroundColor: "#FFFFFF",
+                border: "1px solid #CBD5E1",
+                color: "#475569",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxSizing: "border-box",
+              }}
             >
               Save as Draft
             </button>
@@ -461,7 +742,24 @@ export function MaterialRequestModal({
               type="button"
               onClick={() => handleSubmit(false)}
               disabled={submitting}
-              className="btn btn-primary text-sm py-2 px-5 bg-amber-500 hover:bg-amber-600 text-white font-semibold flex items-center gap-2"
+              style={{
+                height: "40px",
+                padding: "0 22px",
+                borderRadius: "10px",
+                backgroundColor: "#FFB000",
+                color: "#0F172A",
+                fontWeight: 700,
+                fontSize: "13px",
+                border: "none",
+                cursor: submitting ? "not-allowed" : "pointer",
+                whiteSpace: "nowrap",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                boxShadow: "0 2px 6px rgba(255, 176, 0, 0.25)",
+                boxSizing: "border-box",
+              }}
             >
               {submitting ? (
                 <>
@@ -470,7 +768,7 @@ export function MaterialRequestModal({
                 </>
               ) : (
                 <>
-                  <CheckCircle2 size={16} />
+                  <CheckCircle2 size={16} className="stroke-[2.5]" />
                   <span>Submit Request</span>
                 </>
               )}
