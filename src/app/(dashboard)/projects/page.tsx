@@ -73,6 +73,10 @@ export default function ProjectsPage() {
     const matchesClient = clientFilter === "all" || project.client_name === clientFilter;
     
     return matchesSearch && matchesStatus && matchesClient;
+  }).sort((a, b) => {
+    const timeA = new Date(a.created_at || a.updated_at || a.start_date || 0).getTime();
+    const timeB = new Date(b.created_at || b.updated_at || b.start_date || 0).getTime();
+    return timeB - timeA;
   });
 
   // Calculate pagination
@@ -240,7 +244,7 @@ export default function ProjectsPage() {
                       <div>{formatDateShort(project.end_date)}</div>
                     </td>
                     <td className="text-center" style={{ width: "90px", padding: "10px 8px" }}>
-                      <CircularProgress value={project.progress} showPercentageBelow size={36} strokeWidth={3.5} />
+                      <CircularProgress value={project.progress} showPercentageInCenter size={40} strokeWidth={3.5} />
                     </td>
                     <td>
                       <StatusBadge status={project.status} size="sm" />

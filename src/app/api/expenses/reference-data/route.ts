@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       // 1. Fetch Projects from Supabase
       const { data: pData } = await supabase
         .from("projects")
-        .select("id, project_code, name, approved_budget, actual_expenses, status, city")
+        .select("id, project_code, name, approved_budget, status, city")
         .order("created_at", { ascending: false });
       if (pData && pData.length > 0) dbProjects = pData;
 

@@ -7,6 +7,7 @@ interface CircularProgressProps {
   value: number;
   size?: number;
   strokeWidth?: number;
+  showPercentageInCenter?: boolean;
   showPercentageBelow?: boolean;
   color?: string;
   className?: string;
@@ -14,9 +15,10 @@ interface CircularProgressProps {
 
 export function CircularProgress({
   value,
-  size = 38,
+  size = 40,
   strokeWidth = 3.5,
-  showPercentageBelow = true,
+  showPercentageInCenter = true,
+  showPercentageBelow = false,
   color,
   className = "",
 }: CircularProgressProps) {
@@ -25,6 +27,11 @@ export function CircularProgress({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (clampedValue / 100) * circumference;
   const strokeColor = color || getProgressColor(clampedValue);
+
+  // Dynamic font size according to circle diameter
+  const fontSize = clampedValue === 100
+    ? (size >= 44 ? "11px" : size >= 38 ? "10px" : "9px")
+    : (size >= 44 ? "12px" : size >= 38 ? "11px" : "10px");
 
   return (
     <div 
@@ -75,6 +82,24 @@ export function CircularProgress({
             />
           </g>
         </svg>
+
+        {/* Center Percentage Display */}
+        {showPercentageInCenter && (
+          <span
+            style={{
+              position: "absolute",
+              fontSize,
+              fontWeight: 700,
+              color: "#0F172A",
+              textAlign: "center",
+              lineHeight: 1,
+              letterSpacing: clampedValue === 100 ? "-0.5px" : "-0.2px",
+              userSelect: "none",
+            }}
+          >
+            {clampedValue}%
+          </span>
+        )}
       </div>
 
       {showPercentageBelow && (
