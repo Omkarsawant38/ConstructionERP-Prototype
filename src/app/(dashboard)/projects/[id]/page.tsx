@@ -7,7 +7,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { useProjects } from "@/lib/projectStore";
-import { Edit, Share, MapPin, Calendar, Building2, User } from "lucide-react";
+import { Edit, MapPin, Calendar, Building2, User } from "lucide-react";
 import { formatDateShort, formatCurrencyFull } from "@/lib/utils";
 
 // Tabs imports will go here as they are built
@@ -70,16 +70,10 @@ export default function ProjectDetailsPage() {
           { label: project.name }
         ]}
         actions={
-          <>
-            <button className="btn btn-secondary">
-              <Share size={16} />
-              <span className="hidden sm:inline">Share</span>
-            </button>
-            <button className="btn btn-primary" style={{ background: "var(--color-primary)" }}>
-              <Edit size={16} />
-              <span className="hidden sm:inline">Edit Project</span>
-            </button>
-          </>
+          <button className="btn btn-primary" style={{ background: "var(--color-primary)" }}>
+            <Edit size={16} />
+            <span className="hidden sm:inline">Edit Project</span>
+          </button>
         }
       >
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600">
@@ -123,7 +117,12 @@ export default function ProjectDetailsPage() {
 
       {/* Tab Content Area */}
       <div>
-        {activeTab === "overview" && <ProjectOverviewTab project={project} />}
+        {activeTab === "overview" && (
+          <ProjectOverviewTab 
+            project={project} 
+            onNavigateToTasks={() => setActiveTab("tasks")} 
+          />
+        )}
         {activeTab === "tasks" && <ProjectTasksTab project={project} />}
         {activeTab === "expenses" && <ProjectExpensesTab project={project} />}
         {activeTab === "materials" && <ProjectMaterialsTab project={project} />}

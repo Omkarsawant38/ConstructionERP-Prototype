@@ -6,6 +6,7 @@ import { useProjects } from "@/lib/projectStore";
 import { formatCurrencyFull, formatDateShort } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { CircularProgress } from "@/components/ui/CircularProgress";
 import { 
   Plus, 
   Search, 
@@ -210,7 +211,7 @@ export default function ProjectsPage() {
                   <th>Project Name</th>
                   <th>Location</th>
                   <th>Dates</th>
-                  <th>Progress</th>
+                  <th className="text-center" style={{ width: "90px" }}>Progress</th>
                   <th>Status</th>
                   <th>Budget</th>
                   <th></th>
@@ -238,8 +239,8 @@ export default function ProjectsPage() {
                       <div>{formatDateShort(project.start_date)} -</div>
                       <div>{formatDateShort(project.end_date)}</div>
                     </td>
-                    <td className="w-40">
-                      <ProgressBar value={project.progress} showLabel />
+                    <td className="text-center" style={{ width: "90px", padding: "10px 8px" }}>
+                      <CircularProgress value={project.progress} showPercentageBelow size={36} strokeWidth={3.5} />
                     </td>
                     <td>
                       <StatusBadge status={project.status} size="sm" />

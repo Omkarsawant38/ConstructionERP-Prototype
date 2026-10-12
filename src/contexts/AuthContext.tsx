@@ -100,16 +100,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ];
       }
 
-      // If permissions are not in DB, populate from DEFAULT_ROLE_PERMISSIONS
-      if (permNames.length === 0) {
-        const { DEFAULT_ROLE_PERMISSIONS } = await import("@/types/rbac");
-        const fallbackSet = new Set<string>();
-        for (const r of userRoleNames) {
-          const perms = DEFAULT_ROLE_PERMISSIONS[r] || [];
-          perms.forEach((p) => fallbackSet.add(p));
-        }
-        permNames = Array.from(fallbackSet);
+      // Guarantee baseline role capabilities by merging DB permissions with DEFAULT_ROLE_PERMISSIONS
+      const { DEFAULT_ROLE_PERMISSIONS } = await import("@/types/rbac");
+      const combinedSet = new Set<string>(permNames);
+      for (const r of userRoleNames) {
+        const perms = DEFAULT_ROLE_PERMISSIONS[r] || [];
+        perms.forEach((p) => combinedSet.add(p));
       }
+      permNames = Array.from(combinedSet);
 
       setPermissions(permNames);
     } catch (error) {

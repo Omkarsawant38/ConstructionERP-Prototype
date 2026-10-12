@@ -153,6 +153,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
   ],
   accountant: [
     'dashboard.view',
+    'projects.view',
     'finance.view',
     'finance.create',
     'finance.approve',

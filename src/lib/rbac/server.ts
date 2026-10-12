@@ -83,15 +83,13 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     ];
   }
 
-  // 4. Fallback permissions from DEFAULT_ROLE_PERMISSIONS if table empty
-  if (permissions.length === 0) {
-    const fallbackSet = new Set<string>();
-    for (const r of roles) {
-      const perms = DEFAULT_ROLE_PERMISSIONS[r] || [];
-      perms.forEach((p) => fallbackSet.add(p));
-    }
-    permissions = Array.from(fallbackSet);
+  // 4. Merge permissions with DEFAULT_ROLE_PERMISSIONS to guarantee baseline role capabilities
+  const combinedSet = new Set<string>(permissions);
+  for (const r of roles) {
+    const perms = DEFAULT_ROLE_PERMISSIONS[r] || [];
+    perms.forEach((p) => combinedSet.add(p));
   }
+  permissions = Array.from(combinedSet);
 
   return {
     id: user.id,

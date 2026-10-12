@@ -138,15 +138,13 @@ export async function updateSession(request: NextRequest) {
               .filter(Boolean);
           }
 
-          // Fallback permissions from DEFAULT_ROLE_PERMISSIONS
-          if (permissions.length === 0) {
-            const fallbackSet = new Set<string>();
-            for (const r of roles) {
-              const rolePerms = DEFAULT_ROLE_PERMISSIONS[r] || [];
-              rolePerms.forEach((p) => fallbackSet.add(p));
-            }
-            permissions = Array.from(fallbackSet);
+          // Merge permissions with DEFAULT_ROLE_PERMISSIONS to guarantee baseline role capabilities
+          const combinedSet = new Set<string>(permissions);
+          for (const r of roles) {
+            const rolePerms = DEFAULT_ROLE_PERMISSIONS[r] || [];
+            rolePerms.forEach((p) => combinedSet.add(p));
           }
+          permissions = Array.from(combinedSet);
 
           // If user lacks permission, redirect to their first accessible route
           if (requiredPermission && !permissions.includes(requiredPermission)) {

@@ -2,12 +2,17 @@
 
 import React from "react";
 import { getProgressColor } from "@/lib/utils";
+import { CircularProgress } from "@/components/ui/CircularProgress";
+
+export { CircularProgress };
 
 interface ProgressBarProps {
   value: number;
   height?: number;
   showLabel?: boolean;
   color?: string;
+  variant?: "bar" | "circular";
+  size?: number;
 }
 
 export function ProgressBar({
@@ -15,7 +20,20 @@ export function ProgressBar({
   height = 6,
   showLabel = false,
   color,
+  variant = "bar",
+  size = 38,
 }: ProgressBarProps) {
+  if (variant === "circular") {
+    return (
+      <CircularProgress
+        value={value}
+        size={size}
+        showPercentageBelow={showLabel}
+        color={color}
+      />
+    );
+  }
+
   const clampedValue = Math.min(Math.max(value, 0), 100);
   const barColor = color || getProgressColor(clampedValue);
 
@@ -44,3 +62,4 @@ export function ProgressBar({
     </div>
   );
 }
+

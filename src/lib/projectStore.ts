@@ -216,39 +216,62 @@ export function useProjects() {
       
       if (!error && data && data.length > 0) {
         // Map supabase projects to Project interface
-        const supabaseProjects: Project[] = data.map((item: any) => ({
-          id: item.id,
-          project_code: item.project_code || "PRJ-000",
-          name: item.name,
-          description: item.description || "",
-          client_name: item.client_name || "",
-          project_type: item.project_type || "Residential",
-          construction_category: item.construction_category || "High-Rise",
-          site_address: item.site_address || "",
-          city: item.city || "",
-          state: item.state || "Maharashtra",
-          postal_code: item.postal_code || "",
-          start_date: item.start_date || "",
-          end_date: item.end_date || "",
-          actual_end_date: item.actual_end_date || "",
-          approved_budget: Number(item.approved_budget) || 0,
-          currency: item.currency || "INR",
-          financial_notes: item.financial_notes || "",
-          project_manager_name: item.project_manager_name || "Unassigned",
-          status: item.status || "planning",
-          health_status: item.health_status || "on-track",
-          progress: item.progress || 0,
-          organization_id: item.organization_id || "org1",
-          created_by: item.created_by || "user1",
-          created_at: item.created_at || new Date().toISOString(),
-          updated_at: item.updated_at || new Date().toISOString(),
-          actual_expenses: 0,
-          remaining_budget: Number(item.approved_budget) || 0,
-          tasks_count: 0,
-          completed_tasks: 0,
-          milestones_count: 0,
-          completed_milestones: 0,
-        }));
+        const supabaseProjects: Project[] = data.map((item: any) => {
+          const demoMatch = demoProjects.find(
+            dp => dp.id === item.id || dp.project_code?.toLowerCase() === (item.project_code || "").toLowerCase()
+          );
+          const localCustom = getCustomProjects();
+          const customMatch = localCustom.find(
+            cp => cp.id === item.id || cp.project_code?.toLowerCase() === (item.project_code || "").toLowerCase()
+          );
+
+          const actualExpenses = customMatch?.actual_expenses !== undefined
+            ? customMatch.actual_expenses
+            : (item.actual_expenses !== undefined && item.actual_expenses !== null
+              ? Number(item.actual_expenses)
+              : (demoMatch?.actual_expenses ?? 0));
+
+          const approvedBudget = Number(item.approved_budget) || (demoMatch?.approved_budget ?? 0);
+          const remainingBudget = customMatch?.remaining_budget !== undefined
+            ? customMatch.remaining_budget
+            : (item.remaining_budget !== undefined && item.remaining_budget !== null
+              ? Number(item.remaining_budget)
+              : (demoMatch?.remaining_budget ?? Math.max(0, approvedBudget - actualExpenses)));
+
+          return {
+            id: item.id,
+            project_code: item.project_code || demoMatch?.project_code || "PRJ-000",
+            name: item.name,
+            description: item.description || demoMatch?.description || "",
+            client_name: item.client_name || demoMatch?.client_name || "",
+            project_type: item.project_type || demoMatch?.project_type || "Residential",
+            construction_category: item.construction_category || demoMatch?.construction_category || "High-Rise",
+            site_address: item.site_address || demoMatch?.site_address || "",
+            city: item.city || demoMatch?.city || "",
+            state: item.state || demoMatch?.state || "Maharashtra",
+            postal_code: item.postal_code || demoMatch?.postal_code || "",
+            start_date: item.start_date || demoMatch?.start_date || "",
+            end_date: item.end_date || demoMatch?.end_date || "",
+            actual_end_date: item.actual_end_date || demoMatch?.actual_end_date || "",
+            approved_budget: approvedBudget,
+            currency: item.currency || demoMatch?.currency || "INR",
+            financial_notes: item.financial_notes || demoMatch?.financial_notes || "",
+            project_manager_name: item.project_manager_name || demoMatch?.project_manager_name || "Unassigned",
+            status: item.status || demoMatch?.status || "planning",
+            health_status: item.health_status || demoMatch?.health_status || "on-track",
+            progress: item.progress ?? demoMatch?.progress ?? 0,
+            organization_id: item.organization_id || "org1",
+            created_by: item.created_by || "user1",
+            created_at: item.created_at || demoMatch?.created_at || new Date().toISOString(),
+            updated_at: item.updated_at || demoMatch?.updated_at || new Date().toISOString(),
+            actual_expenses: actualExpenses,
+            remaining_budget: remainingBudget,
+            tasks_count: demoMatch?.tasks_count || 0,
+            completed_tasks: demoMatch?.completed_tasks || 0,
+            milestones_count: demoMatch?.milestones_count || 0,
+            completed_milestones: demoMatch?.completed_milestones || 0,
+          };
+        });
 
         // Merge: Supabase + local + demo (deduplicating by id and project_code)
         const seenIds = new Set<string>();
