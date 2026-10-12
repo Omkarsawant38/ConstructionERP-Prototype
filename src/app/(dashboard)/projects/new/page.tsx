@@ -7,9 +7,35 @@ import { useToast } from "@/components/ui/Toast";
 import { useRouter } from "next/navigation";
 import { Save, X, Building2, MapPin, Calendar, IndianRupee, Users } from "lucide-react";
 import type { ProjectFormData } from "@/types";
+import { createProject } from "@/lib/projectStore";
+import { useAuth } from "@/contexts/AuthContext";
+import { Select } from "@/components/ui/Select";
+import { RouteGuard } from "@/components/ui/RouteGuard";
+
+const projectTypeOptions = [
+  { value: "Residential", label: "Residential" },
+  { value: "Commercial", label: "Commercial" },
+  { value: "Industrial", label: "Industrial" },
+  { value: "Infrastructure", label: "Infrastructure" },
+];
+
+const categoryOptions = [
+  { value: "High-Rise", label: "High-Rise" },
+  { value: "Mid-Rise", label: "Mid-Rise" },
+  { value: "Villas", label: "Villas" },
+  { value: "Commercial Complex", label: "Commercial Complex" },
+  { value: "Warehouse", label: "Warehouse" },
+];
+
+const initialStatusOptions = [
+  { value: "planning", label: "Planning", color: "#3B82F6" },
+  { value: "active", label: "Active", color: "#16A34A" },
+  { value: "on-hold", label: "On Hold", color: "#F59E0B" },
+];
 
 export default function NewProjectPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const { addToast } = useToast();
   const [loading, setLoading] = useState(false);
   
@@ -71,12 +97,11 @@ export default function NewProjectPage() {
     setLoading(true);
     
     try {
-      // Simulate API call for now. In a real app, this would be a Supabase insert.
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      addToast("success", "Project Created", `Project ${formData.project_code} has been successfully created.`);
+      const created = await createProject(formData, user?.id);
+      addToast("success", "Project Created", `Project "${created.name}" (${created.project_code}) has been successfully created.`);
       router.push("/projects");
     } catch (error) {
+      console.error("Error creating project:", error);
       addToast("error", "Error", "Failed to create project. Please try again.");
     } finally {
       setLoading(false);
@@ -84,15 +109,57 @@ export default function NewProjectPage() {
   };
 
   return (
-    <div className="max-w-[1000px] mx-auto pb-24 relative flex flex-col gap-6" style={{ gap: "24px" }}>
+    <RouteGuard permission="projects.create">
+      <div className="max-w-[1000px] mx-auto relative flex flex-col gap-6" style={{ gap: "24px", paddingBottom: "48px" }}>
       <div>
         <PageHeader 
           title="Create New Project" 
           description="Set up a new construction project and allocate budget."
+          actions={
+            <div className="flex items-center" style={{ gap: "12px" }}>
+              <button 
+                type="button" 
+                onClick={() => router.back()}
+                className="btn btn-secondary cursor-pointer"
+                style={{ 
+                  padding: "0 18px", 
+                  height: "40px", 
+                  borderRadius: "10px", 
+                  fontWeight: 500,
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  color: "#475569"
+                }}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                form="project-form"
+                className="btn btn-primary cursor-pointer"
+                style={{ 
+                  padding: "0 22px", 
+                  height: "40px", 
+                  borderRadius: "10px", 
+                  fontWeight: 600,
+                  backgroundColor: "#FFB000",
+                  color: "#172033",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px"
+                }}
+                disabled={loading}
+              >
+                <Save size={16} />
+                Create Project
+              </button>
+            </div>
+          }
         />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6 relative" style={{ gap: "24px" }}>
+      <form id="project-form" onSubmit={handleSubmit} className="flex flex-col gap-6 relative" style={{ gap: "24px" }}>
         {/* Basic Information */}
         <div className="premium-card" style={{ padding: "32px" }}>
           <div className="flex items-center border-b border-gray-100" style={{ gap: "12px", marginBottom: "24px", paddingBottom: "16px" }}>
@@ -158,35 +225,26 @@ export default function NewProjectPage() {
 
             <div className="col-span-1 md:col-span-6">
               <label className="form-label" htmlFor="project_type">Project Type</label>
-              <select
+              <Select
                 id="project_type"
                 name="project_type"
+                size="lg"
+                options={projectTypeOptions}
                 value={formData.project_type}
-                onChange={handleChange}
-                className="form-input h-11"
-              >
-                <option value="Residential">Residential</option>
-                <option value="Commercial">Commercial</option>
-                <option value="Industrial">Industrial</option>
-                <option value="Infrastructure">Infrastructure</option>
-              </select>
+                onChange={(val) => setFormData((prev) => ({ ...prev, project_type: val }))}
+              />
             </div>
 
             <div className="col-span-1 md:col-span-6">
               <label className="form-label" htmlFor="construction_category">Construction Category</label>
-              <select
+              <Select
                 id="construction_category"
                 name="construction_category"
+                size="lg"
+                options={categoryOptions}
                 value={formData.construction_category}
-                onChange={handleChange}
-                className="form-input h-11"
-              >
-                <option value="High-Rise">High-Rise</option>
-                <option value="Mid-Rise">Mid-Rise</option>
-                <option value="Villas">Villas</option>
-                <option value="Commercial Complex">Commercial Complex</option>
-                <option value="Warehouse">Warehouse</option>
-              </select>
+                onChange={(val) => setFormData((prev) => ({ ...prev, construction_category: val }))}
+              />
             </div>
           </div>
         </div>
@@ -293,17 +351,14 @@ export default function NewProjectPage() {
               
               <div>
                 <label className="form-label" htmlFor="status">Initial Status</label>
-                <select
+                <Select
                   id="status"
                   name="status"
+                  size="lg"
+                  options={initialStatusOptions}
                   value={formData.status}
-                  onChange={handleChange}
-                  className="form-input h-11 bg-blue-50/50"
-                >
-                  <option value="planning">Planning</option>
-                  <option value="active">Active</option>
-                  <option value="on-hold">On Hold</option>
-                </select>
+                  onChange={(val) => setFormData((prev) => ({ ...prev, status: val as ProjectFormData["status"] }))}
+                />
               </div>
             </div>
           </div>
@@ -370,40 +425,65 @@ export default function NewProjectPage() {
           </div>
         </div>
 
-        {/* Sticky Form Actions */}
+        {/* Form Actions (In-flow so they never obscure form inputs) */}
         <div 
-          className="fixed bottom-0 left-0 right-0 lg:left-[var(--sidebar-width)] z-30 bg-white/90 backdrop-blur-md border-t border-gray-200 shadow-lg flex items-center justify-end transition-all duration-300"
-          style={{ padding: "16px" }}
+          className="flex items-center justify-end"
+          style={{ 
+            gap: "16px", 
+            paddingTop: "16px", 
+            paddingBottom: "32px",
+            marginTop: "8px"
+          }}
         >
-          <div className="max-w-[1000px] w-full mx-auto flex items-center justify-end" style={{ gap: "16px" }}>
-            <button 
-              type="button" 
-              onClick={() => router.back()}
-              className="btn btn-secondary h-11 px-6 font-medium"
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="btn btn-primary h-11 px-8 font-semibold shadow-md"
-              disabled={loading}
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Creating...
-                </div>
-              ) : (
-                <>
-                  <Save size={18} />
-                  Create Project
-                </>
-              )}
-            </button>
-          </div>
+          <button 
+            type="button" 
+            onClick={() => router.back()}
+            className="btn btn-secondary cursor-pointer"
+            style={{ 
+              padding: "0 24px", 
+              height: "44px", 
+              borderRadius: "10px", 
+              fontWeight: 500,
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              color: "#475569"
+            }}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            className="btn btn-primary cursor-pointer"
+            style={{ 
+              padding: "0 28px", 
+              height: "44px", 
+              borderRadius: "10px", 
+              fontWeight: 600,
+              backgroundColor: "#FFB000",
+              color: "#172033",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              boxShadow: "0 2px 8px rgba(255, 176, 0, 0.25)"
+            }}
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="flex items-center gap-2" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div className="w-4 h-4 border-2 border-slate-800/30 border-t-slate-800 rounded-full animate-spin" />
+                <span>Creating...</span>
+              </div>
+            ) : (
+              <>
+                <Save size={18} />
+                <span>Create Project</span>
+              </>
+            )}
+          </button>
         </div>
       </form>
     </div>
+    </RouteGuard>
   );
 }

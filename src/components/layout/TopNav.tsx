@@ -11,6 +11,7 @@ import {
   Settings,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ROLE_DISPLAY_NAMES, type RoleName } from "@/types/rbac";
 
 export function TopNav() {
   const { profile, signOut } = useAuth();
@@ -34,8 +35,20 @@ export function TopNav() {
     router.push("/login");
   };
 
-  const displayName = profile?.full_name || "User";
-  const displayRole = profile?.designation || profile?.role || "Project Manager";
+  const rawName = profile?.full_name || profile?.email?.split("@")[0] || "User";
+  const displayName = rawName
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+
+  const roleKey = (profile?.role || "project_manager") as RoleName;
+  const displayRole =
+    profile?.designation ||
+    ROLE_DISPLAY_NAMES[roleKey] ||
+    roleKey
+      .split("_")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
 
   return (
     <header

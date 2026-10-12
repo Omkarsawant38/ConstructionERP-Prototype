@@ -7,6 +7,15 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Plus, Search, Filter, MoreHorizontal, Calendar } from "lucide-react";
 import type { Project } from "@/types";
 import { demoTasks } from "@/lib/demo-data";
+import { Select } from "@/components/ui/Select";
+
+const taskStatusOptions = [
+  { value: "all", label: "All Statuses" },
+  { value: "not-started", label: "Not Started", color: "#94A3B8" },
+  { value: "in-progress", label: "In Progress", color: "#3B82F6" },
+  { value: "completed", label: "Completed", color: "#10B981" },
+  { value: "blocked", label: "Blocked", color: "#EF4444" },
+];
 
 export default function ProjectTasksTab({ project }: { project: Project }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,17 +44,12 @@ export default function ProjectTasksTab({ project }: { project: Project }) {
               className="form-input pl-10 w-full"
             />
           </div>
-          <select 
-            className="form-input w-full sm:w-40"
+          <Select 
+            width="170px"
+            options={taskStatusOptions}
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="all">All Statuses</option>
-            <option value="not-started">Not Started</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="blocked">Blocked</option>
-          </select>
+            onChange={setStatusFilter}
+          />
         </div>
 
         <button className="btn btn-primary self-end sm:self-auto shrink-0">

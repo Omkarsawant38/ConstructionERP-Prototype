@@ -2,14 +2,17 @@
 
 import React from "react";
 import { ModulePlaceholder } from "@/components/ui/ModulePlaceholder";
+import { RouteGuard } from "@/components/ui/RouteGuard";
 import { FileText } from "lucide-react";
 
 export default function DocumentsPage() {
   return (
-    <ModulePlaceholder 
-      title="Documents" 
-      subtitle="Centralized document management for blueprints, permits, contracts, and reports."
-      icon={<FileText size={32} className="text-amber-500" />}
-    />
+    <RouteGuard permission="documents.view">
+      <ModulePlaceholder 
+        title="Documents" 
+        subtitle="Manage architectural drawings, engineering submittals, specifications, and permits."
+        icon={<FileText size={32} className="text-amber-500" />}
+      />
+    </RouteGuard>
   );
 }

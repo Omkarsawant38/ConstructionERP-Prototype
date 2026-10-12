@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
-import { demoProjects } from "@/lib/demo-data";
+import { useProjects } from "@/lib/projectStore";
 import { Edit, Share, MapPin, Calendar, Building2, User } from "lucide-react";
 import { formatDateShort, formatCurrencyFull } from "@/lib/utils";
 
@@ -20,9 +20,19 @@ export default function ProjectDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
+  const { projects, loading } = useProjects();
 
   // Find project
-  const project = demoProjects.find(p => p.id === id);
+  const project = projects.find(p => p.id === id || p.project_code.toLowerCase() === (typeof id === "string" ? id.toLowerCase() : ""));
+
+  if (!project && loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mb-4" />
+        <p className="text-gray-500">Loading project details...</p>
+      </div>
+    );
+  }
 
   if (!project) {
     return (

@@ -2,14 +2,17 @@
 
 import React from "react";
 import { ModulePlaceholder } from "@/components/ui/ModulePlaceholder";
+import { RouteGuard } from "@/components/ui/RouteGuard";
 import { HardHat } from "lucide-react";
 
 export default function WorkforcePage() {
   return (
-    <ModulePlaceholder 
-      title="Workforce Management" 
-      subtitle="Track labor attendance, shifts, productivity, and safety compliance across sites."
-      icon={<HardHat size={32} className="text-amber-500" />}
-    />
+    <RouteGuard permission="workforce.view">
+      <ModulePlaceholder 
+        title="Workforce Management" 
+        subtitle="Track daily labor attendance, trade allocations, and contractor manpower."
+        icon={<HardHat size={32} className="text-amber-500" />}
+      />
+    </RouteGuard>
   );
 }

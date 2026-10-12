@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { demoProjects } from "@/lib/demo-data";
+import { useProjects } from "@/lib/projectStore";
 import { formatCurrencyFull, formatDateShort } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -20,37 +20,84 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Pagination } from "@/components/ui/Pagination";
+import { Select } from "@/components/ui/Select";
+import { PermissionGate } from "@/lib/rbac/client";
+import { RouteGuard } from "@/components/ui/RouteGuard";
+
+const statusFilterOptions = [
+  { value: "all", label: "All Statuses" },
+  { value: "active", label: "Active", color: "#16A34A" },
+  { value: "planning", label: "Planning", color: "#3B82F6" },
+  { value: "on-hold", label: "On Hold", color: "#F59E0B" },
+  { value: "completed", label: "Completed", color: "#10B981" },
+];
 
 export default function ProjectsPage() {
   const router = useRouter();
+  const { projects } = useProjects();
   const [view, setView] = useState<"list" | "grid">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [clientFilter, setClientFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(6);
+
+  // Dynamic client options from project data
+  const clientFilterOptions = [
+    { value: "all", label: "All Clients" },
+    ...Array.from(new Set(projects.map((p) => p.client_name).filter(Boolean))).map((client) => ({
+      value: client as string,
+      label: client as string,
+    })),
+  ];
+
+  const priorityFilterOptions = [
+    { value: "all", label: "All Priorities" },
+    { value: "critical", label: "Critical", color: "#DC2626" },
+    { value: "high", label: "High", color: "#EF4444" },
+    { value: "medium", label: "Medium", color: "#F59E0B" },
+    { value: "low", label: "Low", color: "#3B82F6" },
+  ];
 
   // Filter projects
-  const filteredProjects = demoProjects.filter((project) => {
+  const filteredProjects = projects.filter((project) => {
     const matchesSearch = 
       project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       project.project_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (project.city && project.city.toLowerCase().includes(searchQuery.toLowerCase()));
       
     const matchesStatus = statusFilter === "all" || project.status === statusFilter;
+    const matchesClient = clientFilter === "all" || project.client_name === clientFilter;
     
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesClient;
   });
 
+  // Calculate pagination
+  const totalItems = filteredProjects.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const paginatedProjects = filteredProjects.slice(
+    (safeCurrentPage - 1) * pageSize,
+    safeCurrentPage * pageSize
+  );
+
   return (
-    <div className="flex flex-col gap-6" style={{ gap: "24px" }}>
-      <div>
+    <RouteGuard permission="projects.view">
+      <div className="flex flex-col gap-6" style={{ gap: "24px" }}>
+        <div>
         <PageHeader 
           title="Projects" 
           description="Track operational milestones, client delivery pipelines, and team assignments."
           icon={<FolderKanban size={24} />}
           action={
-            <Link href="/projects/new" className="btn btn-primary">
-              <Plus size={18} />
-              New Project
-            </Link>
+            <PermissionGate permission="projects.create">
+              <Link href="/projects/new" className="btn btn-primary">
+                <Plus size={18} />
+                New Project
+              </Link>
+            </PermissionGate>
           }
         />
       </div>
@@ -71,40 +118,50 @@ export default function ProjectsPage() {
                 type="text"
                 placeholder="Search projects by name, client, or ID..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="form-input w-full h-10"
                 style={{ paddingLeft: "36px" }}
               />
             </div>
           </div>
           
-          <div className="w-full sm:w-40">
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Status</label>
-            <select 
-              className="form-input w-full h-10"
+          <div className="w-full sm:w-44">
+            <Select
+              label="Status"
+              options={statusFilterOptions}
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="all">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="planning">Planning</option>
-              <option value="on-hold">On Hold</option>
-              <option value="completed">Completed</option>
-            </select>
+              onChange={(val) => {
+                setStatusFilter(val);
+                setCurrentPage(1);
+              }}
+            />
           </div>
 
-          <div className="w-full sm:w-40">
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Client</label>
-            <select className="form-input w-full h-10 text-gray-400">
-              <option>All Clients</option>
-            </select>
+          <div className="w-full sm:w-48">
+            <Select
+              label="Client"
+              options={clientFilterOptions}
+              value={clientFilter}
+              onChange={(val) => {
+                setClientFilter(val);
+                setCurrentPage(1);
+              }}
+            />
           </div>
 
-          <div className="w-full sm:w-40">
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">Priority</label>
-            <select className="form-input w-full h-10 text-gray-400">
-              <option>All Priorities</option>
-            </select>
+          <div className="w-full sm:w-44">
+            <Select
+              label="Priority"
+              options={priorityFilterOptions}
+              value={priorityFilter}
+              onChange={(val) => {
+                setPriorityFilter(val);
+                setCurrentPage(1);
+              }}
+            />
           </div>
 
           <div className="flex items-center bg-gray-100 rounded-lg border border-gray-200 h-10 w-full sm:w-auto" style={{ gap: "4px", padding: "4px" }}>
@@ -160,7 +217,7 @@ export default function ProjectsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredProjects.map((project) => (
+                {paginatedProjects.map((project) => (
                   <tr 
                     key={project.id} 
                     className="cursor-pointer hover:bg-gray-50"
@@ -212,7 +269,7 @@ export default function ProjectsPage() {
           className="grid"
           style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "24px" }}
         >
-          {filteredProjects.map((project) => (
+          {paginatedProjects.map((project) => (
             <div 
               key={project.id} 
               className="premium-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow cursor-pointer group"
@@ -283,6 +340,21 @@ export default function ProjectsPage() {
           ))}
         </div>
       )}
+
+      {/* Pagination Controls */}
+      {filteredProjects.length > 0 && (
+        <Pagination
+          currentPage={safeCurrentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          pageSizeOptions={[6, 10, 20]}
+          itemName="projects"
+        />
+      )}
     </div>
+    </RouteGuard>
   );
 }

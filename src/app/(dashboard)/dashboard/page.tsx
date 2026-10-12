@@ -3,7 +3,8 @@
 import React, { useMemo } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { KPICard } from "@/components/dashboard/KPICard";
-import { demoProjects, demoExpenses, demoTasks, demoMaterials } from "@/lib/demo-data";
+import { demoExpenses, demoTasks, demoMaterials } from "@/lib/demo-data";
+import { useProjects } from "@/lib/projectStore";
 import { formatCurrencyFull, formatCurrency } from "@/lib/utils";
 import { 
   FolderKanban, 
@@ -30,21 +31,36 @@ import {
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import Link from "next/link";
+import { PermissionGate } from "@/lib/rbac/client";
+import { RouteGuard } from "@/components/ui/RouteGuard";
+import { useAuth } from "@/contexts/AuthContext";
+import { ROLE_DISPLAY_NAMES, type RoleName } from "@/types/rbac";
 
 export default function DashboardPage() {
+  const { projects } = useProjects();
+  const { profile } = useAuth();
+
+  const roleKey = (profile?.role || "project_manager") as RoleName;
+  const userRoleTitle = ROLE_DISPLAY_NAMES[roleKey] || (roleKey ? roleKey.replace(/_/g, " ") : "Team Member");
+  const rawName = profile?.full_name || profile?.email?.split("@")[0] || "";
+  const capitalizedName = rawName
+    ? rawName.split(" ").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+    : userRoleTitle;
+  const welcomeGreeting = userRoleTitle ? `Welcome back, ${userRoleTitle}!` : `Welcome back, ${capitalizedName}!`;
+
   // Calculate KPIs
-  const totalProjects = demoProjects.length;
-  const activeProjects = demoProjects.filter(p => p.status === "active").length;
-  const completedProjects = demoProjects.filter(p => p.status === "completed").length;
+  const totalProjects = projects.length;
+  const activeProjects = projects.filter(p => p.status === "active").length;
+  const completedProjects = projects.filter(p => p.status === "completed").length;
   
-  const totalBudget = demoProjects.reduce((sum, p) => sum + (p.approved_budget || 0), 0);
-  const totalExpenses = demoProjects.reduce((sum, p) => sum + (p.actual_expenses || 0), 0);
+  const totalBudget = projects.reduce((sum, p) => sum + (p.approved_budget || 0), 0);
+  const totalExpenses = projects.reduce((sum, p) => sum + (p.actual_expenses || 0), 0);
   
   const pendingTasks = demoTasks.filter(t => t.status !== "completed").length;
   const lowStockMaterials = demoMaterials.filter(m => m.current_stock <= m.reorder_level).length;
 
   // Chart Data: Budget vs Actual
-  const budgetVsActualData = demoProjects
+  const budgetVsActualData = projects
     .filter(p => p.status !== "planning")
     .map(p => ({
       name: p.project_code,
@@ -56,52 +72,55 @@ export default function DashboardPage() {
   // Chart Data: Project Status Distribution
   const statusData = [
     { name: "Active", value: activeProjects, color: "var(--color-success)" },
-    { name: "Planning", value: demoProjects.filter(p => p.status === "planning").length, color: "var(--color-info)" },
+    { name: "Planning", value: projects.filter(p => p.status === "planning").length, color: "var(--color-info)" },
     { name: "Completed", value: completedProjects, color: "var(--color-primary)" },
-    { name: "On Hold", value: demoProjects.filter(p => p.status === "on-hold").length, color: "var(--color-warning)" },
+    { name: "On Hold", value: projects.filter(p => p.status === "on-hold").length, color: "var(--color-warning)" },
   ].filter(item => item.value > 0);
 
   return (
-    <div className="flex flex-col gap-8 pb-12" style={{ gap: "32px" }}>
-      {/* Hero Section */}
-      <div className="relative rounded-2xl overflow-hidden min-h-[220px] flex items-center bg-slate-900 shadow-md">
-        <div 
-          className="absolute inset-0 opacity-40 mix-blend-overlay"
-          style={{ 
-            backgroundImage: "url('https://images.unsplash.com/photo-1541888086225-ee5315f5c71c?q=80&w=2000&auto=format&fit=crop')",
-            backgroundSize: "cover",
-            backgroundPosition: "center"
-          }}
-        />
-        <div className="relative z-10 flex flex-col justify-center w-full" style={{ padding: "48px" }}>
-          <h1 className="font-bold text-white" style={{ fontSize: "32px", marginBottom: "12px" }}>
-            Welcome back, Omkar!
-          </h1>
-          <p className="text-gray-300 leading-relaxed" style={{ fontSize: "16px", maxWidth: "640px", marginBottom: "32px", lineHeight: "1.6" }}>
-            Here's what's happening with your projects today. You have <strong className="text-white">{pendingTasks} pending tasks</strong> and <strong className="text-white">{lowStockMaterials} materials</strong> requiring attention.
-          </p>
-          <div>
-            <Link 
-              href="/projects/new" 
-              className="transition-transform hover:-translate-y-0.5 shadow-sm"
-              style={{ 
-                display: "inline-flex", 
-                alignItems: "center", 
-                gap: "8px", 
-                padding: "12px 24px", 
-                borderRadius: "8px", 
-                background: "var(--color-primary)", 
-                color: "var(--color-text-primary)", 
-                fontWeight: 600,
-                fontSize: "15px"
-              }}
-            >
-              <FolderKanban size={18} />
-              New Project
-            </Link>
+    <RouteGuard permission="dashboard.view">
+      <div className="flex flex-col gap-8 pb-12" style={{ gap: "32px" }}>
+        {/* Hero Section */}
+        <div className="relative rounded-2xl overflow-hidden min-h-[220px] flex items-center bg-slate-900 shadow-md">
+          <div 
+            className="absolute inset-0 opacity-40 mix-blend-overlay"
+            style={{ 
+              backgroundImage: "url('https://images.unsplash.com/photo-1541888086225-ee5315f5c71c?q=80&w=2000&auto=format&fit=crop')",
+              backgroundSize: "cover",
+              backgroundPosition: "center"
+            }}
+          />
+          <div className="relative z-10 flex flex-col justify-center w-full" style={{ padding: "48px" }}>
+            <h1 className="font-bold text-white" style={{ fontSize: "32px", marginBottom: "12px" }}>
+              {welcomeGreeting}
+            </h1>
+            <p className="text-gray-300 leading-relaxed" style={{ fontSize: "16px", maxWidth: "640px", marginBottom: "32px", lineHeight: "1.6" }}>
+              Here's what's happening with your projects today. You have <strong className="text-white">{pendingTasks} pending tasks</strong> and <strong className="text-white">{lowStockMaterials} materials</strong> requiring attention.
+            </p>
+            <PermissionGate permission="projects.create">
+              <div>
+                <Link 
+                  href="/projects/new" 
+                  className="transition-transform hover:-translate-y-0.5 shadow-sm"
+                  style={{ 
+                    display: "inline-flex", 
+                    alignItems: "center", 
+                    gap: "8px", 
+                    padding: "12px 24px", 
+                    borderRadius: "8px", 
+                    background: "var(--color-primary)", 
+                    color: "var(--color-text-primary)", 
+                    fontWeight: 600,
+                    fontSize: "15px"
+                  }}
+                >
+                  <FolderKanban size={18} />
+                  New Project
+                </Link>
+              </div>
+            </PermissionGate>
           </div>
         </div>
-      </div>
 
       <div>
         <PageHeader 
@@ -243,7 +262,7 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {demoProjects.filter(p => p.status === "active").slice(0, 5).map(project => (
+              {projects.filter(p => p.status === "active").slice(0, 5).map(project => (
                 <tr key={project.id} className="hover:bg-gray-50/50 transition-colors">
                   <td style={{ padding: "16px", paddingLeft: "24px" }}>
                     <div className="font-semibold text-gray-900">{project.name}</div>
@@ -266,5 +285,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+    </RouteGuard>
   );
 }

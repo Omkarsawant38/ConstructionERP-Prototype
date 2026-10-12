@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { usePermissions } from "@/lib/rbac/client";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -21,32 +22,42 @@ import {
   Menu,
   X,
   Hammer,
+  Shield,
 } from "lucide-react";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Projects", href: "/projects", icon: FolderKanban },
-  { name: "Planning & Tasks", href: "/planning", icon: ListTodo },
-  { name: "Materials & Inventory", href: "/materials", icon: Package },
-  { name: "Procurement", href: "/procurement", icon: ShoppingCart },
-  { name: "Finance & Billing", href: "/finance", icon: DollarSign },
-  { name: "Contractors & Vendors", href: "/contractors", icon: Users },
-  { name: "Workforce Management", href: "/workforce", icon: HardHat },
-  { name: "Documents", href: "/documents", icon: FileText },
-  { name: "Site Management", href: "/site-management", icon: Building2 },
-  { name: "Reports & Analytics", href: "/reports", icon: BarChart3 },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
+  { name: "Projects", href: "/projects", icon: FolderKanban, permission: "projects.view" },
+  { name: "Planning & Tasks", href: "/planning", icon: ListTodo, permission: "planning.view" },
+  { name: "Materials & Inventory", href: "/materials", icon: Package, permission: "inventory.view" },
+  { name: "Procurement", href: "/procurement", icon: ShoppingCart, permission: "procurement.view" },
+  { name: "Finance & Billing", href: "/finance", icon: DollarSign, permission: "finance.view" },
+  { name: "Contractors & Vendors", href: "/contractors", icon: Users, permission: "contractors.view" },
+  { name: "Workforce Management", href: "/workforce", icon: HardHat, permission: "workforce.view" },
+  { name: "Documents", href: "/documents", icon: FileText, permission: "documents.view" },
+  { name: "Site Management", href: "/site-management", icon: Building2, permission: "site_progress.view" },
+  { name: "Reports & Analytics", href: "/reports", icon: BarChart3, permission: "reports.view" },
+  { name: "Settings", href: "/settings", icon: Settings, permission: "settings.view" },
 ];
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const { hasPermission, hasRole, roles, permissions, loading } = usePermissions();
 
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
     return pathname.startsWith(href);
   };
+
+  // Filter navigation items based on user permissions
+  const visibleNavigation = navigation.filter((item) => {
+    // Only super_admin bypasses all permissions
+    if (hasRole('super_admin')) return true;
+    // Check if user has the required permission
+    return hasPermission(item.permission);
+  });
 
   const sidebarContent = (
     <div
@@ -94,7 +105,7 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto" style={{ padding: "16px 20px 16px 28px" }}>
         <div className="flex flex-col" style={{ gap: "6px" }}>
-          {navigation.map((item) => {
+          {visibleNavigation.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
@@ -138,6 +149,56 @@ export function Sidebar() {
               </Link>
             );
           })}
+
+          {/* User Management - shown only to Super Admin */}
+          {hasRole('super_admin') && (
+            <>
+              <div
+                className="border-t my-2"
+                style={{ borderColor: "var(--color-border)" }}
+              />
+              <Link
+                href="/settings/users"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center rounded-lg transition-all duration-200 group min-w-0"
+                style={{
+                  height: "42px",
+                  padding: "0 14px",
+                  gap: "12px",
+                  background: pathname.startsWith("/settings/users")
+                    ? "var(--color-primary)"
+                    : "transparent",
+                  color: pathname.startsWith("/settings/users")
+                    ? "var(--color-text-primary)"
+                    : "var(--color-text-secondary)",
+                }}
+                title={collapsed ? "User Management" : undefined}
+              >
+                <div className="flex items-center justify-center shrink-0 w-[22px]">
+                  <Shield
+                    size={20}
+                    strokeWidth={pathname.startsWith("/settings/users") ? 2.2 : 1.8}
+                    style={{
+                      color: pathname.startsWith("/settings/users")
+                        ? "var(--color-text-primary)"
+                        : "var(--color-text-secondary)",
+                    }}
+                  />
+                </div>
+                {!collapsed && (
+                  <span
+                    className="truncate leading-[20px]"
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: pathname.startsWith("/settings/users") ? 600 : 500
+                    }}
+                  >
+                    User Management
+                  </span>
+                )}
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 

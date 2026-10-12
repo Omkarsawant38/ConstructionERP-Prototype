@@ -6,6 +6,15 @@ import { Plus, Search, Filter, MoreHorizontal, FileText } from "lucide-react";
 import type { Project } from "@/types";
 import { demoExpenses } from "@/lib/demo-data";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Select } from "@/components/ui/Select";
+
+const expenseCategoryOptions = [
+  { value: "all", label: "All Categories" },
+  { value: "materials", label: "Materials", color: "#3B82F6" },
+  { value: "labor", label: "Labor", color: "#10B981" },
+  { value: "equipment", label: "Equipment", color: "#F59E0B" },
+  { value: "professional-fees", label: "Professional Fees", color: "#8B5CF6" },
+];
 
 export default function ProjectExpensesTab({ project }: { project: Project }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,17 +58,12 @@ export default function ProjectExpensesTab({ project }: { project: Project }) {
               className="form-input pl-10 w-full"
             />
           </div>
-          <select 
-            className="form-input w-full sm:w-40"
+          <Select 
+            width="180px"
+            options={expenseCategoryOptions}
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <option value="all">All Categories</option>
-            <option value="materials">Materials</option>
-            <option value="labor">Labor</option>
-            <option value="equipment">Equipment</option>
-            <option value="professional-fees">Professional Fees</option>
-          </select>
+            onChange={setCategoryFilter}
+          />
         </div>
 
         <button className="btn btn-primary self-end sm:self-auto shrink-0">
