@@ -58,6 +58,44 @@ export function getProjectById(idOrCode: string): Project | undefined {
 }
 
 /**
+ * Increment or adjust actual_expenses for a project and recalculate remaining_budget
+ */
+export function updateProjectExpensesTotal(projectIdOrCode: string, amountToAdd: number) {
+  if (typeof window === "undefined") return;
+  const custom = getCustomProjects();
+  const index = custom.findIndex(
+    p => p.id === projectIdOrCode || p.project_code.toLowerCase() === projectIdOrCode.toLowerCase()
+  );
+
+  if (index >= 0) {
+    const updated = [...custom];
+    const newExpenses = (updated[index].actual_expenses || 0) + amountToAdd;
+    const newRemaining = Math.max(0, (updated[index].approved_budget || 0) - newExpenses);
+    updated[index] = {
+      ...updated[index],
+      actual_expenses: newExpenses,
+      remaining_budget: newRemaining,
+    };
+    saveCustomProjects(updated);
+  } else {
+    // If it's a demo project not yet in custom projects, copy it into custom projects with updated values
+    const demo = demoProjects.find(
+      p => p.id === projectIdOrCode || p.project_code.toLowerCase() === projectIdOrCode.toLowerCase()
+    );
+    if (demo) {
+      const newExpenses = (demo.actual_expenses || 0) + amountToAdd;
+      const newRemaining = Math.max(0, (demo.approved_budget || 0) - newExpenses);
+      const cloned: Project = {
+        ...demo,
+        actual_expenses: newExpenses,
+        remaining_budget: newRemaining,
+      };
+      saveCustomProjects([cloned, ...custom]);
+    }
+  }
+}
+
+/**
  * Create and persist a new project
  */
 export async function createProject(

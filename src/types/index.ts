@@ -136,9 +136,37 @@ export interface ProjectExpense {
   description?: string;
   receipt_url?: string;
   organization_id: string;
-  created_by: string;
+  created_by?: string;
+  recorded_by?: string;
   created_at: string;
   updated_at: string;
+  // Accountant module extensions
+  expense_type?: "Labor" | "Material" | "Other";
+  worker_id?: string;
+  worker_name?: string;
+  material_id?: string;
+  material_name?: string;
+  quantity?: number;
+  unit?: string;
+  rate?: number;
+  payment_method?: string;
+  payee?: string;
+  status?: "draft" | "pending_approval" | "approved" | "rejected";
+  approved_by?: string;
+  approved_at?: string;
+  rejection_reason?: string;
+  // Joined relation fields
+  project?: {
+    id: string;
+    name: string;
+    project_code: string;
+    approved_budget: number;
+  };
+  recorder?: {
+    id: string;
+    full_name: string;
+    email: string;
+  };
 }
 
 // ===== Material =====
@@ -173,14 +201,91 @@ export interface Material {
 
 export interface StockMovement {
   id: string;
+  movement_number: string;
+  project_id: string;
   material_id: string;
+  material_name?: string;
+  material?: Material;
+  request_id?: string;
+  request_item_id?: string;
   movement_type: "receipt" | "issue" | "adjustment";
   quantity: number;
-  project_id?: string;
+  unit: string;
+  unit_cost: number;
+  total_cost: number;
+  date: string;
+  supplier_id?: string;
+  supplier_name?: string;
+  source_or_location?: string;
+  reference_number?: string;
   notes?: string;
+  attachment_url?: string;
+  recorded_by?: string;
+  recorded_by_name?: string;
   organization_id: string;
-  created_by: string;
   created_at: string;
+}
+
+export type MaterialRequestStatus =
+  | "draft"
+  | "pending_approval"
+  | "approved"
+  | "partially_fulfilled"
+  | "fulfilled"
+  | "rejected";
+
+export type MaterialRequestPriority = "low" | "medium" | "high" | "critical";
+
+export interface MaterialRequestItem {
+  id: string;
+  request_id: string;
+  material_id: string;
+  material_name?: string;
+  material?: Material;
+  quantity: number;
+  unit: string;
+  estimated_unit_cost: number;
+  fulfilled_quantity: number;
+  notes?: string;
+  created_at?: string;
+}
+
+export interface MaterialRequest {
+  id: string;
+  request_number: string;
+  project_id: string;
+  status: MaterialRequestStatus;
+  priority: MaterialRequestPriority;
+  required_date: string;
+  delivery_location?: string;
+  requested_by?: string;
+  requested_by_name?: string;
+  notes?: string;
+  attachment_url?: string;
+  approved_by?: string;
+  approved_by_name?: string;
+  approved_at?: string;
+  approval_notes?: string;
+  rejection_reason?: string;
+  items: MaterialRequestItem[];
+  organization_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectMaterialRegisterItem {
+  material_id: string;
+  material_name: string;
+  category: MaterialCategory;
+  unit: string;
+  warehouse_stock: number;
+  received_quantity: number;
+  issued_quantity: number;
+  current_stock: number;
+  reorder_level: number;
+  unit_cost: number;
+  total_project_cost: number;
+  stock_status: "in-stock" | "low-stock" | "out-of-stock";
 }
 
 // ===== Supplier =====
@@ -362,3 +467,51 @@ export interface ExpenseFormData {
   supplier: string;
   description: string;
 }
+
+// ===== Project Team Member =====
+export type TeamMemberRole =
+  | "Project Manager"
+  | "Site Engineer"
+  | "Accountant"
+  | "Procurement Manager"
+  | "Store / Inventory Manager"
+  | "Civil Engineer"
+  | "Safety Officer"
+  | "Supervisor";
+
+export type TeamDepartment =
+  | "Project Management"
+  | "Site Operations"
+  | "Finance & Accounts"
+  | "Procurement & Supply"
+  | "Inventory & Store"
+  | "Quality & Safety"
+  | "Engineering & Design";
+
+export interface ProjectTeamMember {
+  id: string;
+  project_id: string;
+  full_name: string;
+  email?: string;
+  phone?: string;
+  designation: string;
+  role: TeamMemberRole;
+  department: TeamDepartment;
+  assignment_date: string;
+  status: "active" | "inactive";
+  notes?: string;
+  is_sample?: boolean;
+}
+
+export interface TeamMemberFormData {
+  full_name: string;
+  email?: string;
+  phone?: string;
+  designation: string;
+  role: TeamMemberRole;
+  department: TeamDepartment;
+  assignment_date: string;
+  status: "active" | "inactive";
+  notes?: string;
+}
+

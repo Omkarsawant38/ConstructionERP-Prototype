@@ -58,14 +58,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .filter(Boolean) as RoleName[];
 
       // Fallback: If user_roles table is unseeded or user has no assigned role record,
-      // fallback to profile.role or super_admin so user is never locked out of navigation
+      // fallback to profile.role. Do NOT default unknown users to super_admin!
       if (userRoleNames.length === 0) {
-        if (profileData?.role === "super_admin" || profileData?.role === "admin") {
-          userRoleNames = ["super_admin"];
-        } else if (profileData?.role) {
+        if (profileData?.role && profileData?.role !== "user") {
           userRoleNames = [profileData.role as RoleName];
-        } else {
+        } else if (authUser.email?.startsWith("admin@")) {
           userRoleNames = ["super_admin"];
+        } else if (authUser.email?.startsWith("director@")) {
+          userRoleNames = ["owner_director"];
+        } else if (authUser.email?.startsWith("pm@")) {
+          userRoleNames = ["project_manager"];
+        } else if (authUser.email?.startsWith("accounts@")) {
+          userRoleNames = ["accountant"];
+        } else if (authUser.email?.startsWith("site.")) {
+          userRoleNames = ["site_engineer"];
+        } else if (authUser.email?.startsWith("procurement@")) {
+          userRoleNames = ["procurement_manager"];
+        } else if (authUser.email?.startsWith("store@")) {
+          userRoleNames = ["store_inventory_manager"];
+        } else {
+          userRoleNames = [(profileData?.role as RoleName) || "project_manager"];
         }
       }
       setRoles(userRoleNames);

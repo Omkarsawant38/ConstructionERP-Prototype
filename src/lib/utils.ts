@@ -78,11 +78,12 @@ export function getProgressColor(progress: number): string {
   return "var(--color-error)";
 }
 
-export function getStatusColor(status: string): {
+export function getStatusColor(status?: string | null): {
   bg: string;
   text: string;
   dot: string;
 } {
+  const safeStatus = (status || "pending").toLowerCase();
   const statusMap: Record<string, { bg: string; text: string; dot: string }> = {
     planning: { bg: "#DBEAFE", text: "#2563EB", dot: "#3B82F6" },
     active: { bg: "#DCFCE7", text: "#16A34A", dot: "#22C55E" },
@@ -97,13 +98,15 @@ export function getStatusColor(status: string): {
     blocked: { bg: "#FEE2E2", text: "#DC2626", dot: "#EF4444" },
     approved: { bg: "#DCFCE7", text: "#16A34A", dot: "#22C55E" },
     pending: { bg: "#FEF3C7", text: "#D97706", dot: "#F59E0B" },
+    pending_approval: { bg: "#FEF3C7", text: "#D97706", dot: "#F59E0B" },
     rejected: { bg: "#FEE2E2", text: "#DC2626", dot: "#EF4444" },
     draft: { bg: "#F3F4F6", text: "#6B7280", dot: "#9CA3AF" },
     "low-stock": { bg: "#FEE2E2", text: "#DC2626", dot: "#EF4444" },
     "in-stock": { bg: "#DCFCE7", text: "#16A34A", dot: "#22C55E" },
+    "out-of-stock": { bg: "#F3F4F6", text: "#6B7280", dot: "#9CA3AF" },
   };
 
-  return statusMap[status.toLowerCase()] || { bg: "#F3F4F6", text: "#6B7280", dot: "#9CA3AF" };
+  return statusMap[safeStatus] || { bg: "#F3F4F6", text: "#6B7280", dot: "#9CA3AF" };
 }
 
 export function generateProjectCode(prefix: string = "PRJ", num: number): string {

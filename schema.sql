@@ -217,6 +217,25 @@ CREATE TABLE IF NOT EXISTS public.site_updates (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Project Team Members
+CREATE TABLE IF NOT EXISTS public.project_team_members (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  project_id TEXT NOT NULL,
+  full_name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  designation TEXT NOT NULL,
+  role TEXT NOT NULL,
+  department TEXT NOT NULL,
+  assignment_date DATE DEFAULT CURRENT_DATE,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  notes TEXT,
+  is_sample BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_project_team_members_project_id ON public.project_team_members(project_id);
+
 -- 4. TIMESTAMPS TRIGGER FUNCTION
 CREATE OR REPLACE FUNCTION public.handle_updated_at()
 RETURNS TRIGGER AS $$
@@ -244,6 +263,10 @@ EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 DO $$ BEGIN
   CREATE TRIGGER set_updated_at_expenses BEFORE UPDATE ON public.expenses FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+DO $$ BEGIN
+  CREATE TRIGGER set_updated_at_project_team_members BEFORE UPDATE ON public.project_team_members FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- 5. AUTH USER AUTO-PROFILE TRIGGER
@@ -280,12 +303,13 @@ ALTER TABLE public.suppliers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.purchase_orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.contractors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.site_updates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_team_members ENABLE ROW LEVEL SECURITY;
 
 DO $$
 DECLARE
   tbl text;
 BEGIN
-  FOR tbl IN SELECT unnest(ARRAY['profiles', 'projects', 'tasks', 'milestones', 'expenses', 'materials', 'suppliers', 'purchase_orders', 'contractors', 'site_updates']) LOOP
+  FOR tbl IN SELECT unnest(ARRAY['profiles', 'projects', 'tasks', 'milestones', 'expenses', 'materials', 'suppliers', 'purchase_orders', 'contractors', 'site_updates', 'project_team_members']) LOOP
     EXECUTE format('DROP POLICY IF EXISTS "Allow select for all" ON public.%I', tbl);
     EXECUTE format('CREATE POLICY "Allow select for all" ON public.%I FOR SELECT USING (true)', tbl);
 
@@ -466,3 +490,26 @@ INSERT INTO public.contractors (
 ('Shree Ganesh Steel Fixers', 'Shree Ganesh Infra', 'Bar Bending & Structural', 'ganeshsteel@gmail.com', '+91 97654 32100', 4.9),
 ('Apex Water Proofing', 'Apex Solutions Ltd', 'Waterproofing & Chemical Treatment', 'info@apexwaterproof.com', '+91 98221 99887', 4.6)
 ON CONFLICT DO NOTHING;
+
+-- Initial Project Team Members
+INSERT INTO public.project_team_members (
+  project_id, full_name, email, phone, designation, role, department, assignment_date, status, notes, is_sample
+) VALUES
+  ('p1', 'Omkar Sawant', 'omkar.sawant@triples.com', '+91 98201 11223', 'Senior Project Manager', 'Project Manager', 'Project Management', '2024-01-15', 'active', 'Direct lead in charge of schedule, site milestone sign-offs, and client delivery.', true),
+  ('p1', 'Priya Sharma', 'priya.sharma@triples.com', '+91 98202 22334', 'Lead Site Engineer', 'Site Engineer', 'Site Operations', '2024-01-20', 'active', 'Manages RCC structural pouring, rebar checks, and contractor shift coordination.', true),
+  ('p1', 'Kavita Verma', 'kavita.verma@triples.com', '+91 98203 33445', 'Senior Project Accountant', 'Accountant', 'Finance & Accounts', '2024-02-01', 'active', 'Processes contractor RA bills, petty cash disbursements, and monthly cost reconciliations.', true),
+  ('p1', 'Rohan Mane', 'rohan.mane@triples.com', '+91 98204 44556', 'Structural Civil Engineer', 'Civil Engineer', 'Engineering & Design', '2024-02-05', 'active', 'Oversees QA/QC testing, cube test certifications, and architectural alignment.', true),
+  ('p1', 'Siddharth Rao', 'siddharth.rao@triples.com', '+91 98205 55667', 'Procurement & Vendor Lead', 'Procurement Manager', 'Procurement & Supply', '2024-02-10', 'active', 'Issues purchase orders for TMT steel, bulk cement, and specialty facade fittings.', true),
+  ('p1', 'Ganesh Kadam', 'ganesh.kadam@triples.com', '+91 98206 66778', 'Site Inventory & Yard Manager', 'Store / Inventory Manager', 'Inventory & Store', '2024-02-18', 'active', 'Controls Goods Receipt Notes (GRN), store dispatch chits, and steel inventory ledger.', true),
+  ('p1', 'Nitin Joshi', 'nitin.joshi@triples.com', '+91 98207 77889', 'EHS Officer', 'Safety Officer', 'Quality & Safety', '2024-03-01', 'active', 'Conducts daily morning toolbox talks, scaffolding safety audits, and PPE enforcement.', true),
+  ('p1', 'Rajesh Kumar', 'rajesh.kumar@triples.com', '+91 98208 88990', 'Site Execution Supervisor', 'Supervisor', 'Site Operations', '2024-03-10', 'active', 'Coordinates daily workforce attendance, equipment operators, and sub-tier mason gangs.', true),
+  ('PRJ-001', 'Omkar Sawant', 'omkar.sawant@triples.com', '+91 98201 11223', 'Senior Project Manager', 'Project Manager', 'Project Management', '2024-01-15', 'active', 'Direct lead in charge of schedule, site milestone sign-offs, and client delivery.', true),
+  ('PRJ-001', 'Priya Sharma', 'priya.sharma@triples.com', '+91 98202 22334', 'Lead Site Engineer', 'Site Engineer', 'Site Operations', '2024-01-20', 'active', 'Manages RCC structural pouring, rebar checks, and contractor shift coordination.', true),
+  ('PRJ-001', 'Kavita Verma', 'kavita.verma@triples.com', '+91 98203 33445', 'Senior Project Accountant', 'Accountant', 'Finance & Accounts', '2024-02-01', 'active', 'Processes contractor RA bills, petty cash disbursements, and monthly cost reconciliations.', true),
+  ('PRJ-001', 'Rohan Mane', 'rohan.mane@triples.com', '+91 98204 44556', 'Structural Civil Engineer', 'Civil Engineer', 'Engineering & Design', '2024-02-05', 'active', 'Oversees QA/QC testing, cube test certifications, and architectural alignment.', true),
+  ('PRJ-001', 'Siddharth Rao', 'siddharth.rao@triples.com', '+91 98205 55667', 'Procurement & Vendor Lead', 'Procurement Manager', 'Procurement & Supply', '2024-02-10', 'active', 'Issues purchase orders for TMT steel, bulk cement, and specialty facade fittings.', true),
+  ('PRJ-001', 'Ganesh Kadam', 'ganesh.kadam@triples.com', '+91 98206 66778', 'Site Inventory & Yard Manager', 'Store / Inventory Manager', 'Inventory & Store', '2024-02-18', 'active', 'Controls Goods Receipt Notes (GRN), store dispatch chits, and steel inventory ledger.', true),
+  ('PRJ-001', 'Nitin Joshi', 'nitin.joshi@triples.com', '+91 98207 77889', 'EHS Officer', 'Safety Officer', 'Quality & Safety', '2024-03-01', 'active', 'Conducts daily morning toolbox talks, scaffolding safety audits, and PPE enforcement.', true),
+  ('PRJ-001', 'Rajesh Kumar', 'rajesh.kumar@triples.com', '+91 98208 88990', 'Site Execution Supervisor', 'Supervisor', 'Site Operations', '2024-03-10', 'active', 'Coordinates daily workforce attendance, equipment operators, and sub-tier mason gangs.', true)
+ON CONFLICT DO NOTHING;
+

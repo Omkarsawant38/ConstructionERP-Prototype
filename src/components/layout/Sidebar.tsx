@@ -7,15 +7,7 @@ import { usePermissions } from "@/lib/rbac/client";
 import {
   LayoutDashboard,
   FolderKanban,
-  ListTodo,
-  Package,
-  ShoppingCart,
   DollarSign,
-  Users,
-  HardHat,
-  FileText,
-  Building2,
-  BarChart3,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -28,15 +20,7 @@ import {
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
   { name: "Projects", href: "/projects", icon: FolderKanban, permission: "projects.view" },
-  { name: "Planning & Tasks", href: "/planning", icon: ListTodo, permission: "planning.view" },
-  { name: "Materials & Inventory", href: "/materials", icon: Package, permission: "inventory.view" },
-  { name: "Procurement", href: "/procurement", icon: ShoppingCart, permission: "procurement.view" },
   { name: "Finance & Billing", href: "/finance", icon: DollarSign, permission: "finance.view" },
-  { name: "Contractors & Vendors", href: "/contractors", icon: Users, permission: "contractors.view" },
-  { name: "Workforce Management", href: "/workforce", icon: HardHat, permission: "workforce.view" },
-  { name: "Documents", href: "/documents", icon: FileText, permission: "documents.view" },
-  { name: "Site Management", href: "/site-management", icon: Building2, permission: "site_progress.view" },
-  { name: "Reports & Analytics", href: "/reports", icon: BarChart3, permission: "reports.view" },
   { name: "Settings", href: "/settings", icon: Settings, permission: "settings.view" },
 ];
 

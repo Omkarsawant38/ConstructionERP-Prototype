@@ -4,14 +4,16 @@ import React from "react";
 import { getStatusColor } from "@/lib/utils";
 
 interface StatusBadgeProps {
-  status: string;
+  status?: string | null;
   size?: "sm" | "md";
   showDot?: boolean;
 }
 
 export function StatusBadge({ status, size = "md", showDot = true }: StatusBadgeProps) {
-  const colors = getStatusColor(status);
-  const label = status
+  const safeStatus = status || "pending";
+  const colors = getStatusColor(safeStatus);
+  const label = safeStatus
+    .replace(/_/g, " ")
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");

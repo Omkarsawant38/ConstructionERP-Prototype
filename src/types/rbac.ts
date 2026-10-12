@@ -87,18 +87,10 @@ export const VALID_ROLES: RoleName[] = [
 export const MODULE_ROUTE_MAP: Record<string, string[]> = {
   dashboard: ['/dashboard'],
   projects: ['/projects'],
-  planning: ['/planning'],
   expenses: ['/finance'],
   finance: ['/finance'],
   payments: ['/finance'],
   receipts: ['/finance'],
-  inventory: ['/materials'],
-  procurement: ['/procurement'],
-  contractors: ['/contractors'],
-  workforce: ['/workforce'],
-  documents: ['/documents'],
-  site_progress: ['/site-management'],
-  reports: ['/reports'],
   users: ['/settings'],
   settings: ['/settings'],
 };
@@ -107,15 +99,7 @@ export const MODULE_ROUTE_MAP: Record<string, string[]> = {
 export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   '/dashboard': 'dashboard.view',
   '/projects': 'projects.view',
-  '/planning': 'planning.view',
-  '/materials': 'inventory.view',
-  '/procurement': 'procurement.view',
   '/finance': 'finance.view',
-  '/contractors': 'contractors.view',
-  '/workforce': 'workforce.view',
-  '/documents': 'documents.view',
-  '/site-management': 'site_progress.view',
-  '/reports': 'reports.view',
   '/settings': 'settings.view',
 };
 
@@ -123,19 +107,27 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
 export const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
   super_admin: [
     'dashboard.view', 'projects.view', 'planning.view', 'inventory.view',
-    'procurement.view', 'finance.view', 'contractors.view', 'workforce.view',
-    'documents.view', 'site_progress.view', 'reports.view', 'settings.view',
+    'inventory.request', 'inventory.approve', 'inventory.stock_in', 'inventory.stock_out', 'inventory.purchase',
+    'procurement.view', 'procurement.create', 'procurement.update', 'procurement.approve',
+    'finance.view', 'finance.create', 'finance.approve',
+    'contractors.view', 'contractors.manage', 'workforce.view', 'workforce.manage',
+    'documents.view', 'documents.upload', 'documents.delete',
+    'site_progress.view', 'site_progress.create', 'site_progress.update',
+    'reports.view', 'reports.export', 'settings.view', 'users.view', 'users.create', 'users.update', 'users.assign_roles'
   ],
   owner_director: [
     'dashboard.view',
     'projects.view',
     'planning.view',
+    'inventory.view',
+    'inventory.approve',
     'finance.view',
     'contractors.view',
     'workforce.view',
     'documents.view',
     'site_progress.view',
     'reports.view',
+    'reports.export',
     'settings.view',
   ],
   project_manager: [
@@ -149,6 +141,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
     'planning.update',
     'inventory.view',
     'inventory.request',
+    'inventory.approve',
     'procurement.view',
     'contractors.view',
     'workforce.view',
@@ -190,6 +183,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
   procurement_manager: [
     'inventory.view',
     'inventory.purchase',
+    'inventory.stock_in',
     'procurement.view',
     'procurement.create',
     'procurement.update',

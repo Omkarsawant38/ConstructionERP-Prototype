@@ -13,8 +13,9 @@ import { formatDateShort, formatCurrencyFull } from "@/lib/utils";
 // Tabs imports will go here as they are built
 import ProjectOverviewTab from "./_components/ProjectOverviewTab";
 import ProjectTasksTab from "./_components/ProjectTasksTab";
-import ProjectMilestonesTab from "./_components/ProjectMilestonesTab";
 import ProjectExpensesTab from "./_components/ProjectExpensesTab";
+import ProjectMaterialsTab from "./_components/ProjectMaterialsTab";
+import ProjectTeamTab from "./_components/ProjectTeamTab";
 
 export default function ProjectDetailsPage() {
   const { id } = useParams();
@@ -49,12 +50,9 @@ export default function ProjectDetailsPage() {
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "tasks", label: "Tasks" },
-    { id: "milestones", label: "Milestones" },
     { id: "expenses", label: "Expenses" },
     { id: "materials", label: "Materials" },
-    { id: "documents", label: "Documents" },
     { id: "team", label: "Team" },
-    { id: "photos", label: "Site Photos" },
   ];
 
   return (
@@ -127,24 +125,9 @@ export default function ProjectDetailsPage() {
       <div>
         {activeTab === "overview" && <ProjectOverviewTab project={project} />}
         {activeTab === "tasks" && <ProjectTasksTab project={project} />}
-        {activeTab === "milestones" && <ProjectMilestonesTab project={project} />}
         {activeTab === "expenses" && <ProjectExpensesTab project={project} />}
-        
-        {/* Render placeholder for unbuilt tabs */}
-        {!["overview", "tasks", "milestones", "expenses"].includes(activeTab) && (
-          <div className="premium-card p-12 text-center">
-             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 text-amber-600 mb-4">
-               <Building2 size={32} />
-             </div>
-             <h3 className="text-lg font-bold text-gray-900 mb-2">{tabs.find(t=>t.id===activeTab)?.label} Module</h3>
-             <p className="text-gray-500 max-w-md mx-auto">
-               This module is part of the secondary implementation phase. Data models and core UI are ready.
-             </p>
-             <span className="inline-block mt-4 px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full">
-               Preview Available Soon
-             </span>
-          </div>
-        )}
+        {activeTab === "materials" && <ProjectMaterialsTab project={project} />}
+        {activeTab === "team" && <ProjectTeamTab project={project} />}
       </div>
     </div>
   );

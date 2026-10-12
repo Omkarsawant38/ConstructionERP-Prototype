@@ -5,12 +5,15 @@ import { formatCurrencyFull, formatDateShort } from "@/lib/utils";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Calendar, Clock, AlertTriangle, CheckCircle2, TrendingUp } from "lucide-react";
 import type { Project } from "@/types";
-import { demoTasks, demoMilestones, demoActivities } from "@/lib/demo-data";
+import { demoMilestones, demoActivities } from "@/lib/demo-data";
+import { useProjectTasks } from "@/lib/taskStore";
 
 export default function ProjectOverviewTab({ project }: { project: Project }) {
+  const { tasks: allProjectTasks } = useProjectTasks(project);
+
   // Get related data
-  const upcomingTasks = demoTasks
-    .filter(t => t.project_id === project.id && t.status !== "completed")
+  const upcomingTasks = allProjectTasks
+    .filter(t => t.status !== "completed")
     .sort((a, b) => new Date(a.due_date || "").getTime() - new Date(b.due_date || "").getTime())
     .slice(0, 3);
     

@@ -38,9 +38,9 @@ import { ROLE_DISPLAY_NAMES, type RoleName } from "@/types/rbac";
 
 export default function DashboardPage() {
   const { projects } = useProjects();
-  const { profile } = useAuth();
+  const { profile, roles } = useAuth();
 
-  const roleKey = (profile?.role || "project_manager") as RoleName;
+  const roleKey = (roles[0] || profile?.role || "project_manager") as RoleName;
   const userRoleTitle = ROLE_DISPLAY_NAMES[roleKey] || (roleKey ? roleKey.replace(/_/g, " ") : "Team Member");
   const rawName = profile?.full_name || profile?.email?.split("@")[0] || "";
   const capitalizedName = rawName

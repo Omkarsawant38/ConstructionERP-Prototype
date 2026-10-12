@@ -43,8 +43,8 @@ export function TopNav() {
 
   const roleKey = (profile?.role || "project_manager") as RoleName;
   const displayRole =
-    profile?.designation ||
     ROLE_DISPLAY_NAMES[roleKey] ||
+    profile?.designation ||
     roleKey
       .split("_")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -69,7 +69,7 @@ export function TopNav() {
           />
           <input
             type="text"
-            placeholder="Search projects, materials, suppliers, documents..."
+            placeholder="Search projects, expenses, materials, team members..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="form-input py-2 text-sm"

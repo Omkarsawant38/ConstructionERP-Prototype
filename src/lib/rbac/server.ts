@@ -43,13 +43,24 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       .eq('id', user.id)
       .single();
 
-    if (profile?.role === 'super_admin' || profile?.role === 'admin') {
-      roles = ['super_admin'];
-    } else if (profile?.role) {
+    if (profile?.role && profile?.role !== 'user') {
       roles = [profile.role as RoleName];
-    } else {
-      // Temporary fallback for demo/bootstrap so initial user is not blocked
+    } else if (user.email?.startsWith('admin@')) {
       roles = ['super_admin'];
+    } else if (user.email?.startsWith('director@')) {
+      roles = ['owner_director'];
+    } else if (user.email?.startsWith('pm@')) {
+      roles = ['project_manager'];
+    } else if (user.email?.startsWith('accounts@')) {
+      roles = ['accountant'];
+    } else if (user.email?.startsWith('site.')) {
+      roles = ['site_engineer'];
+    } else if (user.email?.startsWith('procurement@')) {
+      roles = ['procurement_manager'];
+    } else if (user.email?.startsWith('store@')) {
+      roles = ['store_inventory_manager'];
+    } else {
+      roles = [(profile?.role as RoleName) || 'project_manager'];
     }
   }
 
